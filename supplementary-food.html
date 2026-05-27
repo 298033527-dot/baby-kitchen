@@ -111,16 +111,6 @@ body {
 .flow-branch { padding-left: 4px; }
 .flow-item { font-size: 11.5px; color: #666; line-height: 1.8; }
 .flow-tip { font-size: 11px; color: #b47a2a; background: #fef8ec; border-left: 3px solid #f0c060; border-radius: 4px; padding: 4px 8px; margin: 4px 0 6px; line-height: 1.6; }
-.flow-chart { display: flex; align-items: flex-start; justify-content: center; gap: 4px; padding: 8px 0; overflow-x: auto; }
-.flow-step { flex: 1; min-width: 90px; max-width: 120px; text-align: center; }
-.flow-step-box { background: #faf8f5; border-radius: 10px; padding: 10px 6px; border: 2px solid #e8e0d8; min-height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.flow-step-box.ingredient { border-color: var(--pink-light); background: #fef5f8; }
-.flow-step-box.blend { border-color: var(--orange-light); background: #fef9f2; }
-.flow-step-box.split { border-color: var(--green-light); background: #f4faf4; }
-.flow-step-emoji { font-size: 20px; margin-bottom: 2px; }
-.flow-step-label { font-size: 10px; color: #999; font-weight: 500; margin-bottom: 2px; }
-.flow-step-desc { font-size: 11.5px; color: #444; font-weight: 600; line-height: 1.4; }
-.flow-arrow { display: flex; align-items: center; font-size: 16px; color: #ccc; flex-shrink: 0; padding: 0 2px; margin-top: 20px; }
 .flow-legend { background: #faf8f5; border-radius: 8px; padding: 8px 10px; margin-top: 8px; border: 1px solid #f0ede8; }
 .prep-methods { display: flex; flex-direction: column; gap: 6px; padding: 4px 0; }
 .method-card { background: #faf8f5; border-radius: 8px; padding: 8px 10px; border-left: 3px solid var(--pink-light); }
@@ -469,19 +459,19 @@ let currentMainIngredient = '山药';
 // 每种主食材的一周计划模板
 const PLAN_TEMPLATES = {
   '山药': {
-    pair: '红枣', // 蒸糕搭配
+    pair: '红枣',
     sweet: ['红枣', '胡萝卜'],
     prepCakeName: '山药红枣糕',
     prepCakeIngredients: '90g 山药泥 + 30g 红枣',
-    freezeUse: '周三拌面 / 周五拌粥',
+    freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
-      { day:'周二', meals:[{time:'午餐',fresh:'南瓜蒸糕',frozen:'山药红枣糕',frozenDay:'周一'}] },
-      { day:'周三', meals:[{time:'午餐',fresh:null,frozen:'山药泥',frozenDay:'周一',suggest:'搭配新鲜猪肉碎+西兰花→猪肉山药蒸面'}] },
-      { day:'周四', meals:[{time:'午餐',fresh:'胡萝卜西兰花蒸糕',frozen:'山药红枣糕',frozenDay:'周一'}] },
-      { day:'周五', meals:[{time:'午餐',fresh:null,frozen:'山药泥',frozenDay:'周一',suggest:'搭配新鲜猪肉碎+胡萝卜→山药猪肉胡萝卜蒸面'}] },
-      { day:'周六', meals:[{time:'午餐',fresh:'猪肉南瓜蒸糕'}] },
-      { day:'周日', meals:[{time:'午餐',fresh:'胡萝卜蒸糕',frozen:'山药红枣糕',frozenDay:'周一'}] },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜山药蒸面',frozen:'山药红枣糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花山药蒸面',frozen:'山药红枣泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜山药蒸面',frozen:'山药红枣糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'猪肉山药蒸面',frozen:'山药红枣泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'山药猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'山药红枣糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'胡萝卜猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'山药红枣糕',frozenDay:'周一'}] },
     ]
   },
   '南瓜': {
@@ -489,15 +479,15 @@ const PLAN_TEMPLATES = {
     sweet: ['南瓜', '胡萝卜'],
     prepCakeName: '南瓜猪肉蒸糕',
     prepCakeIngredients: '90g 南瓜泥 + 40g 猪肉碎',
-    freezeUse: '周三拌面 / 周五拌粥',
+    freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
-      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜蒸糕',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
-      { day:'周三', meals:[{time:'午餐',fresh:null,frozen:'南瓜泥',frozenDay:'周一',suggest:'搭配新鲜鳕鱼碎+西兰花→南瓜鳕鱼蒸面'}] },
-      { day:'周四', meals:[{time:'午餐',fresh:'山药南瓜蒸糕',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
-      { day:'周五', meals:[{time:'午餐',fresh:null,frozen:'南瓜泥',frozenDay:'周一',suggest:'搭配新鲜猪肉碎+胡萝卜→南瓜猪肉胡萝卜蒸面'}] },
-      { day:'周六', meals:[{time:'午餐',fresh:'西兰花蒸糕'}] },
-      { day:'周日', meals:[{time:'午餐',fresh:'猪肉胡萝卜蒸面'}] },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜南瓜蒸面',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花南瓜蒸面',frozen:'南瓜泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'山药南瓜蒸面',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'猪肉南瓜蒸面',frozen:'南瓜泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'胡萝卜猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
     ]
   },
   '胡萝卜': {
@@ -505,15 +495,15 @@ const PLAN_TEMPLATES = {
     sweet: ['胡萝卜', '南瓜'],
     prepCakeName: '胡萝卜蒸糕',
     prepCakeIngredients: '90g 胡萝卜泥 + 30g 山药泥',
-    freezeUse: '周三拌面 / 周五拌粥',
+    freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
-      { day:'周二', meals:[{time:'午餐',fresh:'山药南瓜蒸糕',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
-      { day:'周三', meals:[{time:'午餐',fresh:null,frozen:'胡萝卜泥',frozenDay:'周一',suggest:'搭配新鲜猪肉碎+西兰花→胡萝卜猪肉蒸面'}] },
-      { day:'周四', meals:[{time:'午餐',fresh:'猪肉南瓜蒸糕',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
-      { day:'周五', meals:[{time:'午餐',fresh:null,frozen:'胡萝卜泥',frozenDay:'周一',suggest:'搭配新鲜鳕鱼碎+南瓜→胡萝卜鳕鱼蒸面'}] },
-      { day:'周六', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面'}] },
-      { day:'周日', meals:[{time:'午餐',fresh:'山药红枣蒸糕',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
+      { day:'周二', meals:[{time:'午餐',fresh:'山药胡萝卜蒸面',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花胡萝卜蒸面',frozen:'胡萝卜泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜胡萝卜蒸面',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'猪肉胡萝卜蒸面',frozen:'胡萝卜泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'山药猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
     ]
   },
   '西兰花': {
@@ -521,15 +511,15 @@ const PLAN_TEMPLATES = {
     sweet: ['胡萝卜', '南瓜'],
     prepCakeName: '西兰花胡萝卜蒸糕',
     prepCakeIngredients: '70g 西兰花泥 + 20g 胡萝卜泥',
-    freezeUse: '周三拌面 / 周五拌粥',
+    freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
-      { day:'周二', meals:[{time:'午餐',fresh:'南瓜蒸糕',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
-      { day:'周三', meals:[{time:'午餐',fresh:null,frozen:'西兰花泥',frozenDay:'周一',suggest:'搭配新鲜猪肉碎+山药→西兰花猪肉蒸面'}] },
-      { day:'周四', meals:[{time:'午餐',fresh:'山药红枣蒸糕',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
-      { day:'周五', meals:[{time:'午餐',fresh:null,frozen:'西兰花泥',frozenDay:'周一',suggest:'搭配新鲜鳕鱼碎+胡萝卜→西兰花鳕鱼蒸面'}] },
-      { day:'周六', meals:[{time:'午餐',fresh:'猪肉南瓜蒸糕'}] },
-      { day:'周日', meals:[{time:'午餐',fresh:'胡萝卜山药蒸面'}] },
+      { day:'周二', meals:[{time:'午餐',fresh:'南瓜西兰花蒸面',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'山药西兰花蒸面',frozen:'西兰花泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'胡萝卜西兰花蒸面',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'猪肉西兰花蒸面',frozen:'西兰花泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'南瓜猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'胡萝卜猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
     ]
   },
   '猪肉': {
@@ -537,15 +527,15 @@ const PLAN_TEMPLATES = {
     sweet: ['胡萝卜', '南瓜', '红枣'],
     prepCakeName: '猪肉胡萝卜蒸糕',
     prepCakeIngredients: '100g 猪肉碎 → 60g做蒸糕 + 剩余冷冻囤货',
-    freezeUse: '周三拌面 / 周五蒸面',
+    freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
-      { day:'周二', meals:[{time:'午餐',fresh:'山药红枣蒸糕',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
-      { day:'周三', meals:[{time:'午餐',fresh:null,frozen:'猪肉碎',frozenDay:'周一',suggest:'搭配新鲜西兰花+山药→猪肉西兰花蒸面'}] },
-      { day:'周四', meals:[{time:'午餐',fresh:'南瓜蒸糕',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
-      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:null,frozen:'猪肉碎',frozenDay:'周一',suggest:'搭配新鲜胡萝卜+南瓜→猪肉南瓜蒸面'}] },
-      { day:'周六', meals:[{time:'午餐',fresh:'胡萝卜西兰花蒸糕',frozen:'猪肉丸',frozenDay:'周五'}] },
-      { day:'周日', meals:[{time:'午餐',fresh:'山药猪肉胡萝卜蒸面'},{time:'晚餐',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周二', meals:[{time:'午餐',fresh:'山药猪肉蒸面',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面',frozen:'猪肉碎',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜猪肉蒸面',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'胡萝卜猪肉蒸面',frozen:'猪肉碎',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'山药猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
     ]
   },
   '牛肉': {
@@ -553,15 +543,15 @@ const PLAN_TEMPLATES = {
     sweet: ['南瓜', '胡萝卜', '红枣'],
     prepCakeName: '牛肉南瓜糕',
     prepCakeIngredients: '100g 牛肉碎 → 60g做蒸糕 + 剩余冷冻囤货',
-    freezeUse: '周三拌面 / 周五烩饭',
+    freezeUse: '周三蒸面 / 周日烩饭',
     plans: [
       { day:'周一', isPrep:true },
-      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜蒸糕',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
-      { day:'周三', meals:[{time:'午餐',fresh:null,frozen:'牛肉碎',frozenDay:'周一',suggest:'搭配新鲜西兰花+山药→牛肉西兰花蒸面'}] },
-      { day:'周四', meals:[{time:'午餐',fresh:'山药南瓜蒸糕',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
-      { day:'周五', meals:[{time:'午餐',fresh:'牛肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:null,frozen:'牛肉碎',frozenDay:'周一',suggest:'搭配新鲜胡萝卜+南瓜→牛肉南瓜烩饭（10M+）'}] },
-      { day:'周六', meals:[{time:'午餐',fresh:'猪肉南瓜蒸糕'}] },
-      { day:'周日', meals:[{time:'午餐',fresh:'胡萝卜山药蒸面',frozen:'牛肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜牛肉蒸面',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花牛肉蒸面',frozen:'牛肉碎',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'山药牛肉蒸面',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'牛肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'南瓜牛肉烩饭（10M+）',frozen:'牛肉碎',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'胡萝卜牛肉蒸面',frozen:'牛肉丸',frozenDay:'周五'},{time:'午餐',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'西兰花牛肉蒸面',frozen:'牛肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
     ]
   },
   '鳕鱼': {
@@ -569,17 +559,18 @@ const PLAN_TEMPLATES = {
     sweet: ['胡萝卜', '南瓜'],
     prepCakeName: '鳕鱼玉米糕',
     prepCakeIngredients: '80g 鳕鱼泥 + 20g 玉米碎 → 60g做蒸糕 + 剩余冷冻囤货',
-    freezeUse: '周三拌面 / 周五蒸面',
+    freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
-      { day:'周二', meals:[{time:'午餐',fresh:'南瓜蒸糕',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
-      { day:'周三', meals:[{time:'午餐',fresh:null,frozen:'鳕鱼泥',frozenDay:'周一',suggest:'搭配新鲜西兰花+胡萝卜→鳕鱼西兰花蒸面'}] },
-      { day:'周四', meals:[{time:'午餐',fresh:'山药红枣蒸糕',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
-      { day:'周五', meals:[{time:'午餐',fresh:'鳕鱼丸（批量制作冷冻备用）'},{time:'午餐',fresh:null,frozen:'鳕鱼泥',frozenDay:'周一',suggest:'搭配新鲜西兰花+南瓜→鳕鱼南瓜蒸面'}] },
-      { day:'周六', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面'}] },
-      { day:'周日', meals:[{time:'午餐',fresh:'山药南瓜蒸糕',frozen:'鳕鱼丸',frozenDay:'周五'},{time:'晚餐',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜鳕鱼蒸面',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花鳕鱼蒸面',frozen:'鳕鱼泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜鳕鱼蒸面',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'鳕鱼丸（批量制作冷冻备用）'},{time:'午餐',fresh:'胡萝卜鳕鱼蒸面',frozen:'鳕鱼泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'西兰花鳕鱼蒸面',frozen:'鳕鱼丸',frozenDay:'周五'},{time:'午餐',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'南瓜鳕鱼蒸面',frozen:'鳕鱼丸',frozenDay:'周五'},{time:'晚餐',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
     ]
-  }
+  },
+
 };
 
 // 预设主食材列表
@@ -617,38 +608,6 @@ function hasHighProtein(text) {
 }
 function isDermaActive() {
   return activeStatuses.includes('dermatitis');
-}
-
-function renderFlowChart(ingredient, blendDesc, isMeat, mainG) {
-  const width = 320, height = 110;
-  const colW = 100, gap = 10;
-  const startX = 5;
-  let svg = `<svg viewBox="0 0 ${width} ${height}" style="width:100%;max-width:320px;display:block;margin:0 auto;">`;
-  svg += `<rect x="${startX}" y="8" width="${colW}" height="44" rx="8" fill="#fef5f8" stroke="#f8a4b8" stroke-width="1.5"/>`;
-  svg += `<text x="${startX+colW/2}" y="26" text-anchor="middle" font-size="9" fill="#999">取食材</text>`;
-  svg += `<text x="${startX+colW/2}" y="42" text-anchor="middle" font-size="11" fill="#444" font-weight="600">${ingredient}</text>`;
-  const x1 = startX + colW, x2 = x1 + gap;
-  svg += `<line x1="${x1}" y1="30" x2="${x2}" y2="30" stroke="#ccc" stroke-width="1.5" marker-end="url(#arrow)"/>`;
-  const s2x = startX + colW + gap;
-  svg += `<rect x="${s2x}" y="8" width="${colW}" height="44" rx="8" fill="#fef9f2" stroke="#f0c060" stroke-width="1.5"/>`;
-  svg += `<text x="${s2x+colW/2}" y="26" text-anchor="middle" font-size="9" fill="#999">辅食机打泥</text>`;
-  svg += `<text x="${s2x+colW/2}" y="42" text-anchor="middle" font-size="10" fill="#b47a2a" font-weight="600">${blendDesc}</text>`;
-  const x22 = s2x + colW, x23 = x22 + gap;
-  svg += `<line x1="${x22}" y1="30" x2="${x23}" y2="30" stroke="#ccc" stroke-width="1.5" marker-end="url(#arrow)"/>`;
-  const s3x = s2x + colW + gap;
-  if (isMeat) {
-    svg += `<rect x="${s3x}" y="8" width="${colW}" height="44" rx="8" fill="#f4faf4" stroke="#a8d8a8" stroke-width="1.5"/>`;
-    svg += `<text x="${s3x+colW/2}" y="24" text-anchor="middle" font-size="10" fill="#5a9a5a">🧁 做蒸糕</text>`;
-    svg += `<text x="${s3x+colW/2}" y="40" text-anchor="middle" font-size="10" fill="#5a9a5a">🍜 蒸面配菜</text>`;
-  } else {
-    svg += `<rect x="${s3x}" y="8" width="${colW}" height="44" rx="8" fill="#f4faf4" stroke="#a8d8a8" stroke-width="1.5"/>`;
-    svg += `<text x="${s3x+colW/2}" y="21" text-anchor="middle" font-size="9" fill="#5a9a5a">分流</text>`;
-    svg += `<text x="${s3x+colW/2}" y="34" text-anchor="middle" font-size="9" fill="#5a9a5a">🧊冷冻 10g</text>`;
-    svg += `<text x="${s3x+colW/2}" y="47" text-anchor="middle" font-size="9" fill="#5a9a5a">🧁蒸糕 ${mainG}g</text>`;
-  }
-  svg += `<defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ccc"/></marker></defs>`;
-  svg += `</svg>`;
-  return svg;
 }
 
 function renderWeeklyPlan() {
@@ -708,7 +667,7 @@ function renderWeeklyPlan() {
     html += `<div class="day-bar">`;
     html += `<span class="day-name">${plan.day}</span>`;
     if (isPrep) html += `<span class="day-tag">备菜日</span>`;
-    if (i === 0 && !isPrep) html += `<span style="font-size:10px;color:var(--muted);">（周一备菜冷冻可用）</span>`;
+    if (!isPrep) html += `<span class="day-tag" style="background:#e3f0fd;color:#3a7cc3;">🧊 冰箱取</span>`;
     html += `</div>`;
 
     if (isPrep) {
@@ -745,11 +704,11 @@ function renderWeeklyPlan() {
         const meatBlendTip = meatPair && !isFish
           ? `<div class="flow-tip">💡 打泥顺序：先打${currentMainIngredient}（较硬/需全熟），再加入${meatPair}（蔬菜）混合打</div>`
           : (isFish ? `<div class="flow-tip">💡 打泥顺序：鳕鱼先蒸全熟，去刺后打泥</div>` : '');
-        html += renderFlowChart(currentMainIngredient, mainG + 'g ' + currentMainIngredient + '泥', true, mainG);
+        html += `<div class="flow-main">${template.prepCakeIngredients}</div>`;
         if (meatBlendTip) html += meatBlendTip;
-        html += `<div class="flow-legend">`;
-        html += `<div class="flow-item">🧁 ${template.prepCakeName}</div>`;
-        html += `<div class="flow-item">🍜 残余 + 少许配菜 → 当天蒸面配菜</div>`;
+        html += `<div class="flow-branch">`;
+        html += `<div class="flow-item">├─ 做蒸糕：${template.prepCakeName}</div>`;
+        html += `<div class="flow-item">└─ 残余 + 少许配菜 → 当天蒸面配菜</div>`;
         html += `</div>`;
       } else {
         const totalPuree = mainG + 10;
@@ -757,12 +716,12 @@ function renderWeeklyPlan() {
         const blendTip = hasPair
           ? `<div class="flow-tip">💡 打泥顺序：先打${currentMainIngredient}（水分少/较硬），再加入${template.pair}（水分多）</div>`
           : '';
-        html += renderFlowChart(currentMainIngredient, totalPuree + 'g ' + currentMainIngredient + '泥', false, mainG);
+        html += `<div class="flow-main">${totalPuree}g ${currentMainIngredient}泥 → 辅食机打泥后分流</div>`;
         if (blendTip) html += blendTip;
-        html += `<div class="flow-legend">`;
-        html += `<div class="flow-item">🧊 10g → 单独冷冻备用（${template.freezeUse}）</div>`;
-        html += `<div class="flow-item">🧁 ${mainG}g → 做蒸糕</div>`;
-        html += `<div class="flow-item">🍜 残余 + 少许配菜 → 当天蒸面配菜</div>`;
+        html += `<div class="flow-branch">`;
+        html += `<div class="flow-item">├─ 10g → 单独冷冻备用（${template.freezeUse}）</div>`;
+        html += `<div class="flow-item">├─ ${mainG}g → 做蒸糕</div>`;
+        html += `<div class="flow-item">└─ 残余 + 少许配菜 → 当天蒸面配菜</div>`;
         html += `</div>`;
       }
       html += `</div></div>`;
@@ -860,19 +819,19 @@ function autoGenerateTemplate(ingName, pairIng, sweetIngs, isMeat) {
   const sweets = sweetIngs || (isMeat ? ['胡萝卜', '南瓜'] : ['红枣', '胡萝卜']);
   const cakeName = isMeat ? `${ingName}${pair}蒸糕` : `${ingName}${pair}蒸糕`;
   const ingrDesc = isMeat ? `100g ${ingName}碎 → 60g做蒸糕 + 剩余冷冻囤货` : `90g ${ingName}泥 + 30g ${pair}`;
-  const freezeDesc = isMeat ? '周三拌面 / 周五蒸面' : '周三拌面 / 周五拌粥';
+  const freezeDesc = '周三蒸面 / 周日蒸面';
 
   if (isMeat) {
     return {
       pair, sweet: sweets, prepCakeName: cakeName, prepCakeIngredients: ingrDesc, freezeUse: freezeDesc,
       plans: [
         { day:'周一', isPrep:true },
-        { day:'周二', meals:[{time:'午餐',fresh:`山药红枣蒸糕`,frozen:`${cakeName}`,frozenDay:'周一'}] },
-        { day:'周三', meals:[{time:'午餐',fresh:null,frozen:`${ingName}碎`,frozenDay:'周一',suggest:`搭配新鲜西兰花+山药→${ingName}西兰花蒸面`}] },
-        { day:'周四', meals:[{time:'午餐',fresh:`南瓜蒸糕`,frozen:`${cakeName}`,frozenDay:'周一'}] },
-        { day:'周五', meals:[{time:'午餐',fresh:`${ingName}丸（批量制作冷冻备用）`},{time:'午餐',fresh:null,frozen:`${ingName}碎`,frozenDay:'周一',suggest:`搭配新鲜胡萝卜+南瓜→${ingName}南瓜蒸面`}] },
-        { day:'周六', meals:[{time:'午餐',fresh:`胡萝卜西兰花蒸糕`,frozen:`${ingName}丸`,frozenDay:'周五'}] },
-        { day:'周日', meals:[{time:'午餐',fresh:`山药${ingName}胡萝卜蒸面`},{time:'晚餐',frozen:`${cakeName}`,frozenDay:'周一'}] },
+        { day:'周二', meals:[{time:'午餐',fresh:`山药${ingName}蒸面`,frozen:`${cakeName}`,frozenDay:'周一'}] },
+        { day:'周三', meals:[{time:'午餐',fresh:`西兰花${ingName}蒸面`,frozen:`${ingName}碎`,frozenDay:'周一'}] },
+        { day:'周四', meals:[{time:'午餐',fresh:`南瓜${ingName}蒸面`,frozen:`${cakeName}`,frozenDay:'周一'}] },
+        { day:'周五', meals:[{time:'午餐',fresh:`${ingName}丸（批量制作冷冻备用）`},{time:'午餐',fresh:`胡萝卜${ingName}蒸面`,frozen:`${ingName}碎`,frozenDay:'周一'}] },
+        { day:'周六', meals:[{time:'午餐',fresh:`山药${ingName}蒸面`,frozen:`${ingName}丸`,frozenDay:'周五'},{time:'午餐',frozen:`${cakeName}`,frozenDay:'周一'}] },
+        { day:'周日', meals:[{time:'午餐',fresh:`西兰花${ingName}蒸面`,frozen:`${ingName}丸`,frozenDay:'周五'},{time:'晚餐',frozen:`${cakeName}`,frozenDay:'周一'}] },
       ]
     };
   } else {
@@ -880,12 +839,12 @@ function autoGenerateTemplate(ingName, pairIng, sweetIngs, isMeat) {
       pair, sweet: sweets, prepCakeName: cakeName, prepCakeIngredients: ingrDesc, freezeUse: freezeDesc,
       plans: [
         { day:'周一', isPrep:true },
-        { day:'周二', meals:[{time:'午餐',fresh:`南瓜蒸糕`,frozen:cakeName,frozenDay:'周一'}] },
-        { day:'周三', meals:[{time:'午餐',fresh:null,frozen:`${ingName}泥`,frozenDay:'周一',suggest:`搭配新鲜猪肉碎+西兰花→${ingName}猪肉蒸面`}] },
-        { day:'周四', meals:[{time:'午餐',fresh:`胡萝卜蒸糕`,frozen:cakeName,frozenDay:'周一'}] },
-        { day:'周五', meals:[{time:'午餐',fresh:null,frozen:`${ingName}泥`,frozenDay:'周一',suggest:`搭配新鲜鳕鱼碎+胡萝卜→${ingName}鳕鱼蒸面`}] },
-        { day:'周六', meals:[{time:'午餐',fresh:`猪肉南瓜蒸糕`}] },
-        { day:'周日', meals:[{time:'午餐',fresh:`山药红枣蒸糕`,frozen:cakeName,frozenDay:'周一'}] },
+        { day:'周二', meals:[{time:'午餐',fresh:`胡萝卜${ingName}蒸面`,frozen:cakeName,frozenDay:'周一'}] },
+        { day:'周三', meals:[{time:'午餐',fresh:`西兰花${ingName}蒸面`,frozen:`${ingName}泥`,frozenDay:'周一'}] },
+        { day:'周四', meals:[{time:'午餐',fresh:`南瓜${ingName}蒸面`,frozen:cakeName,frozenDay:'周一'}] },
+        { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:`猪肉${ingName}蒸面`,frozen:`${ingName}泥`,frozenDay:'周一'}] },
+        { day:'周六', meals:[{time:'午餐',fresh:`山药猪肉蒸面`,frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:cakeName,frozenDay:'周一'}] },
+        { day:'周日', meals:[{time:'午餐',fresh:`胡萝卜猪肉蒸面`,frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:cakeName,frozenDay:'周一'}] },
       ]
     };
   }
