@@ -111,6 +111,17 @@ body {
 .flow-branch { padding-left: 4px; }
 .flow-item { font-size: 11.5px; color: #666; line-height: 1.8; }
 .flow-tip { font-size: 11px; color: #b47a2a; background: #fef8ec; border-left: 3px solid #f0c060; border-radius: 4px; padding: 4px 8px; margin: 4px 0 6px; line-height: 1.6; }
+.flow-chart { display: flex; align-items: flex-start; justify-content: center; gap: 4px; padding: 8px 0; overflow-x: auto; }
+.flow-step { flex: 1; min-width: 90px; max-width: 120px; text-align: center; }
+.flow-step-box { background: #faf8f5; border-radius: 10px; padding: 10px 6px; border: 2px solid #e8e0d8; min-height: 60px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.flow-step-box.ingredient { border-color: var(--pink-light); background: #fef5f8; }
+.flow-step-box.blend { border-color: var(--orange-light); background: #fef9f2; }
+.flow-step-box.split { border-color: var(--green-light); background: #f4faf4; }
+.flow-step-emoji { font-size: 20px; margin-bottom: 2px; }
+.flow-step-label { font-size: 10px; color: #999; font-weight: 500; margin-bottom: 2px; }
+.flow-step-desc { font-size: 11.5px; color: #444; font-weight: 600; line-height: 1.4; }
+.flow-arrow { display: flex; align-items: center; font-size: 16px; color: #ccc; flex-shrink: 0; padding: 0 2px; margin-top: 20px; }
+.flow-legend { background: #faf8f5; border-radius: 8px; padding: 8px 10px; margin-top: 8px; border: 1px solid #f0ede8; }
 .prep-methods { display: flex; flex-direction: column; gap: 6px; padding: 4px 0; }
 .method-card { background: #faf8f5; border-radius: 8px; padding: 8px 10px; border-left: 3px solid var(--pink-light); }
 .method-title { font-size: 12.5px; font-weight: 700; color: #c44a8a; margin-bottom: 2px; }
@@ -608,6 +619,38 @@ function isDermaActive() {
   return activeStatuses.includes('dermatitis');
 }
 
+function renderFlowChart(ingredient, blendDesc, isMeat, mainG) {
+  const width = 320, height = 110;
+  const colW = 100, gap = 10;
+  const startX = 5;
+  let svg = `<svg viewBox="0 0 ${width} ${height}" style="width:100%;max-width:320px;display:block;margin:0 auto;">`;
+  svg += `<rect x="${startX}" y="8" width="${colW}" height="44" rx="8" fill="#fef5f8" stroke="#f8a4b8" stroke-width="1.5"/>`;
+  svg += `<text x="${startX+colW/2}" y="26" text-anchor="middle" font-size="9" fill="#999">取食材</text>`;
+  svg += `<text x="${startX+colW/2}" y="42" text-anchor="middle" font-size="11" fill="#444" font-weight="600">${ingredient}</text>`;
+  const x1 = startX + colW, x2 = x1 + gap;
+  svg += `<line x1="${x1}" y1="30" x2="${x2}" y2="30" stroke="#ccc" stroke-width="1.5" marker-end="url(#arrow)"/>`;
+  const s2x = startX + colW + gap;
+  svg += `<rect x="${s2x}" y="8" width="${colW}" height="44" rx="8" fill="#fef9f2" stroke="#f0c060" stroke-width="1.5"/>`;
+  svg += `<text x="${s2x+colW/2}" y="26" text-anchor="middle" font-size="9" fill="#999">辅食机打泥</text>`;
+  svg += `<text x="${s2x+colW/2}" y="42" text-anchor="middle" font-size="10" fill="#b47a2a" font-weight="600">${blendDesc}</text>`;
+  const x22 = s2x + colW, x23 = x22 + gap;
+  svg += `<line x1="${x22}" y1="30" x2="${x23}" y2="30" stroke="#ccc" stroke-width="1.5" marker-end="url(#arrow)"/>`;
+  const s3x = s2x + colW + gap;
+  if (isMeat) {
+    svg += `<rect x="${s3x}" y="8" width="${colW}" height="44" rx="8" fill="#f4faf4" stroke="#a8d8a8" stroke-width="1.5"/>`;
+    svg += `<text x="${s3x+colW/2}" y="24" text-anchor="middle" font-size="10" fill="#5a9a5a">🧁 做蒸糕</text>`;
+    svg += `<text x="${s3x+colW/2}" y="40" text-anchor="middle" font-size="10" fill="#5a9a5a">🍜 蒸面配菜</text>`;
+  } else {
+    svg += `<rect x="${s3x}" y="8" width="${colW}" height="44" rx="8" fill="#f4faf4" stroke="#a8d8a8" stroke-width="1.5"/>`;
+    svg += `<text x="${s3x+colW/2}" y="21" text-anchor="middle" font-size="9" fill="#5a9a5a">分流</text>`;
+    svg += `<text x="${s3x+colW/2}" y="34" text-anchor="middle" font-size="9" fill="#5a9a5a">🧊冷冻 10g</text>`;
+    svg += `<text x="${s3x+colW/2}" y="47" text-anchor="middle" font-size="9" fill="#5a9a5a">🧁蒸糕 ${mainG}g</text>`;
+  }
+  svg += `<defs><marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#ccc"/></marker></defs>`;
+  svg += `</svg>`;
+  return svg;
+}
+
 function renderWeeklyPlan() {
   const scroll = document.getElementById('plan-scroll');
   const template = PLAN_TEMPLATES[currentMainIngredient];
@@ -698,23 +741,28 @@ function renderWeeklyPlan() {
       html += `<div class="level-head">📐 统一备菜流程</div>`;
       html += `<div class="prep-flow">`;
       if (isMeat || isFish) {
-        html += `<div class="flow-main">${template.prepCakeIngredients}</div>`;
-        html += `<div class="flow-branch">`;
-        html += `<div class="flow-item">└─ 残余 + 少许配菜 → 当天蒸面配菜</div>`;
+        const meatPair = template.pair || '';
+        const meatBlendTip = meatPair && !isFish
+          ? `<div class="flow-tip">💡 打泥顺序：先打${currentMainIngredient}（较硬/需全熟），再加入${meatPair}（蔬菜）混合打</div>`
+          : (isFish ? `<div class="flow-tip">💡 打泥顺序：鳕鱼先蒸全熟，去刺后打泥</div>` : '');
+        html += renderFlowChart(currentMainIngredient, mainG + 'g ' + currentMainIngredient + '泥', true, mainG);
+        if (meatBlendTip) html += meatBlendTip;
+        html += `<div class="flow-legend">`;
+        html += `<div class="flow-item">🧁 ${template.prepCakeName}</div>`;
+        html += `<div class="flow-item">🍜 残余 + 少许配菜 → 当天蒸面配菜</div>`;
         html += `</div>`;
       } else {
-        const totalPuree = mainG + 10; // cake portion + standard 10g freeze
-        // 判断是否有多食材，需要提示打泥顺序
+        const totalPuree = mainG + 10;
         const hasPair = template.pair && !['猪肉','牛肉','鳕鱼'].includes(template.pair);
         const blendTip = hasPair
           ? `<div class="flow-tip">💡 打泥顺序：先打${currentMainIngredient}（水分少/较硬），再加入${template.pair}（水分多）</div>`
           : '';
-        html += `<div class="flow-main">${totalPuree}g ${currentMainIngredient}泥 → 辅食机打泥后分流</div>`;
+        html += renderFlowChart(currentMainIngredient, totalPuree + 'g ' + currentMainIngredient + '泥', false, mainG);
         if (blendTip) html += blendTip;
-        html += `<div class="flow-branch">`;
-        html += `<div class="flow-item">├─ 10g → 单独冷冻备用（${template.freezeUse}）</div>`;
-        html += `<div class="flow-item">├─ ${mainG}g → 做蒸糕</div>`;
-        html += `<div class="flow-item">└─ 残余 + 少许配菜 → 当天蒸面配菜</div>`;
+        html += `<div class="flow-legend">`;
+        html += `<div class="flow-item">🧊 10g → 单独冷冻备用（${template.freezeUse}）</div>`;
+        html += `<div class="flow-item">🧁 ${mainG}g → 做蒸糕</div>`;
+        html += `<div class="flow-item">🍜 残余 + 少许配菜 → 当天蒸面配菜</div>`;
         html += `</div>`;
       }
       html += `</div></div>`;
@@ -1076,7 +1124,7 @@ const PRESET_FORMULAS = {
     steps: [
       '食材蒸熟，辅食机打细腻泥（肉类/鱼类务必先全熟再打）',
       '按配比加水、加面粉，搅拌均匀',
-      '倒入模具',
+      '倒入模具：先在模具抹辅食油，再挤入泥定型',
       '25火力，蒸10-15分钟'
     ],
     note: '已做款式：山药红枣糕 / 胡萝卜蒸糕 / 南瓜蒸糕 / 胡萝卜西兰花蒸糕'
@@ -1098,7 +1146,7 @@ const PRESET_FORMULAS = {
     ratio: { a: 1, b: 7, c: null, aLabel: '米', bLabel: '水', cLabel: '' },
     standard: '常规取用：大米 15g + 清水 105g（可按 1:7 比例调整分量）',
     steps: [
-      '早上或中午开始煲：大米淘洗后加水，小火慢煮30-40分钟至软烂稠糯',
+      '早上或中午开始煲：大米淘洗后放入炖锅，选择「BB粥」模式自动炖煮至软烂稠糯',
       '下午喂食前：取适量粥加入煮熟的配菜（胡萝卜泥/南瓜泥/肉碎等），加热搅拌均匀',
       '⚠️ 绿叶菜（菠菜/小白菜等）切记不能提前与生米同煮，需单独焯熟后拌入'
     ],
