@@ -462,7 +462,7 @@ const PLAN_TEMPLATES = {
     pair: '红枣',
     sweet: ['红枣', '胡萝卜'],
     prepCakeName: '山药红枣糕',
-    prepCakeIngredients: '90g 山药泥 + 30g 红枣',
+    prepCakeIngredients: '60g 山药泥 + 20g 红枣',
     freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
@@ -478,7 +478,7 @@ const PLAN_TEMPLATES = {
     pair: '猪肉',
     sweet: ['南瓜', '胡萝卜'],
     prepCakeName: '南瓜猪肉蒸糕',
-    prepCakeIngredients: '90g 南瓜泥 + 40g 猪肉碎',
+    prepCakeIngredients: '60g 南瓜泥 + 30g 猪肉碎',
     freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
@@ -494,7 +494,7 @@ const PLAN_TEMPLATES = {
     pair: '山药',
     sweet: ['胡萝卜', '南瓜'],
     prepCakeName: '胡萝卜蒸糕',
-    prepCakeIngredients: '90g 胡萝卜泥 + 30g 山药泥',
+    prepCakeIngredients: '60g 胡萝卜泥 + 20g 山药泥',
     freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
@@ -510,7 +510,7 @@ const PLAN_TEMPLATES = {
     pair: '胡萝卜',
     sweet: ['胡萝卜', '南瓜'],
     prepCakeName: '西兰花胡萝卜蒸糕',
-    prepCakeIngredients: '70g 西兰花泥 + 20g 胡萝卜泥',
+    prepCakeIngredients: '60g 西兰花泥 + 15g 胡萝卜泥',
     freezeUse: '周三蒸面 / 周日蒸面',
     plans: [
       { day:'周一', isPrep:true },
@@ -570,16 +570,32 @@ const PLAN_TEMPLATES = {
       { day:'周日', meals:[{time:'午餐',fresh:'南瓜鳕鱼蒸面',frozen:'鳕鱼丸',frozenDay:'周五'},{time:'晚餐',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
     ]
   },
+  '鸡肉': {
+    pair: '玉米',
+    sweet: ['玉米', '胡萝卜', '南瓜'],
+    prepCakeName: '鸡肉玉米糕',
+    prepCakeIngredients: '100g 鸡肉碎 → 60g做蒸糕 + 剩余冷冻囤货',
+    freezeUse: '周三蒸面 / 周日蒸面',
+    plans: [
+      { day:'周一', isPrep:true },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜鸡肉蒸面',frozen:'鸡肉玉米糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花鸡肉蒸面',frozen:'鸡肉碎',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜鸡肉蒸面',frozen:'鸡肉玉米糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'鸡肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'玉米鸡肉蒸面',frozen:'鸡肉碎',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'胡萝卜鸡肉蒸面',frozen:'鸡肉丸',frozenDay:'周五'},{time:'午餐',frozen:'鸡肉玉米糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'西兰花鸡肉蒸面',frozen:'鸡肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'鸡肉玉米糕',frozenDay:'周一'}] },
+    ]
+  },
 
 };
 
 // 预设主食材列表
-const PRESET_INGREDIENTS = ['山药', '南瓜', '胡萝卜', '西兰花', '猪肉', '牛肉', '鳕鱼'];
+const PRESET_INGREDIENTS = ['山药', '南瓜', '胡萝卜', '西兰花', '猪肉', '牛肉', '鳕鱼', '鸡肉'];
 
 function buildPlanNutrition(plan, template) {
   // 判断每天的营养搭配
   let meat = false, veg = false, grain = false, sweet = null;
-  const meatWords = ['猪肉', '鳕鱼', '牛肉', '鱼肉', '虾', '肉'];
+  const meatWords = ['猪肉', '鳕鱼', '牛肉', '鸡肉', '鱼肉', '虾', '肉'];
   const vegWords = ['西兰花', '胡萝卜', '南瓜', '山药', '菠菜', '青菜'];
   const sweetWords = ['红枣', '南瓜', '胡萝卜', '玉米'];
 
@@ -602,7 +618,7 @@ function buildPlanNutrition(plan, template) {
 }
 
 // 高蛋白食材检测词（皮炎期触发）
-const HIGH_PROTEIN_WORDS = ['猪肉', '鳕鱼', '牛肉', '鱼肉', '虾', '肉丸', '肉碎', '肉饼'];
+const HIGH_PROTEIN_WORDS = ['猪肉', '鳕鱼', '牛肉', '鸡肉', '鱼肉', '虾', '肉丸', '肉碎', '肉饼'];
 function hasHighProtein(text) {
   return HIGH_PROTEIN_WORDS.some(w => text.includes(w));
 }
@@ -679,7 +695,7 @@ function renderWeeklyPlan() {
       const cakeTotalG = mainG + waterG + flourG;
       const isDerma = isDermaActive();
       const mainIsHighPro = hasHighProtein(currentMainIngredient);
-      const isMeat = ['猪肉', '牛肉'].includes(currentMainIngredient);
+      const isMeat = ['猪肉', '牛肉', '鸡肉'].includes(currentMainIngredient);
       const isFish = currentMainIngredient === '鳕鱼';
 
       html += `<div class="prep-content">`;
@@ -818,7 +834,7 @@ function autoGenerateTemplate(ingName, pairIng, sweetIngs, isMeat) {
   const pair = pairIng || (isMeat ? '胡萝卜' : '红枣');
   const sweets = sweetIngs || (isMeat ? ['胡萝卜', '南瓜'] : ['红枣', '胡萝卜']);
   const cakeName = isMeat ? `${ingName}${pair}蒸糕` : `${ingName}${pair}蒸糕`;
-  const ingrDesc = isMeat ? `100g ${ingName}碎 → 60g做蒸糕 + 剩余冷冻囤货` : `90g ${ingName}泥 + 30g ${pair}`;
+  const ingrDesc = isMeat ? `100g ${ingName}碎 → 60g做蒸糕 + 剩余冷冻囤货` : `60g ${ingName}泥 + 20g ${pair}`;
   const freezeDesc = '周三蒸面 / 周日蒸面';
 
   if (isMeat) {
@@ -949,13 +965,7 @@ function showCustomIngredientModal() {
         <h3>＋ 自定义主食材</h3>
         <label>食材名称</label>
         <input type="text" id="ci-name" placeholder="例如：红薯 / 玉米 / 虾仁">
-        <label>蒸糕搭配食材</label>
-        <input type="text" id="ci-pair" placeholder="例如：红枣（搭配做蒸糕）">
-        <label>天然甜味食材（逗号分隔）</label>
-        <input type="text" id="ci-sweet" placeholder="例如：红枣,胡萝卜">
-        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:12px;">
-          <input type="checkbox" id="ci-meat" style="width:auto;margin:0;"> 这是肉类/鱼类（高蛋白）
-        </label>
+        <p style="font-size:11px;color:#aaa;margin-bottom:12px;">蒸糕搭配食材和甜味食材将自动生成</p>
         <div class="modal-actions">
           <button class="modal-btn cancel" onclick="closeModal('custom-ing-modal')">取消</button>
           <button class="modal-btn confirm" onclick="addCustomIngredient()">确认添加</button>
@@ -965,23 +975,20 @@ function showCustomIngredientModal() {
     modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('show'); });
   }
   document.getElementById('ci-name').value = '';
-  document.getElementById('ci-pair').value = '';
-  document.getElementById('ci-sweet').value = '';
-  document.getElementById('ci-meat').checked = false;
   modal.classList.add('show');
 }
 
 function addCustomIngredient() {
   const name = document.getElementById('ci-name').value.trim();
-  const pair = document.getElementById('ci-pair').value.trim();
-  const sweetRaw = document.getElementById('ci-sweet').value.trim();
-  const isMeat = document.getElementById('ci-meat').checked;
   if (!name) { alert('请填写食材名称'); return; }
   if (PRESET_INGREDIENTS.includes(name) || CUSTOM_INGREDIENTS.includes(name)) { alert('该食材已存在'); return; }
 
-  const sweets = sweetRaw ? sweetRaw.split(/[,，]/).map(s => s.trim()).filter(Boolean) : null;
+  // 自动判断是否为肉类
+  const isMeat = ['肉','鱼','虾','鸡','牛','猪','鳕','羊'].some(w => name.includes(w));
+  const pair = isMeat ? '胡萝卜' : '红枣';
+  const sweets = isMeat ? ['胡萝卜','南瓜'] : ['红枣','胡萝卜'];
   CUSTOM_INGREDIENTS.push(name);
-  CUSTOM_PLAN_TEMPLATES[name] = autoGenerateTemplate(name, pair || '', sweets, isMeat);
+  CUSTOM_PLAN_TEMPLATES[name] = autoGenerateTemplate(name, pair, sweets, isMeat);
   saveCustomIngredients();
 
   // 合并 PLAN_TEMPLATES
@@ -1000,8 +1007,13 @@ function addCustomIngredient() {
 let FRIDGE_ITEMS = JSON.parse(localStorage.getItem('fridgeItems') || 'null');
 if (!FRIDGE_ITEMS) {
   FRIDGE_ITEMS = [
-    { id: 'pre_1', name: '🧁 山药红枣糕', madeDate: '2026-05-23', expiryDays: 7 },
-    { id: 'pre_2', name: '🍜 胡萝卜猪肉面', madeDate: '2026-05-25', expiryDays: 7 },
+    { id: 'pre_1', name: '🧁 鸡肉玉米糕', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_2', name: '🧁 鸡肉玉米糕', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_3', name: '🥣 纯鸡肉泥', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_4', name: '🥣 纯鸡肉泥', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_5', name: '🥣 鸡肉玉米泥', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_6', name: '🥣 鸡肉玉米泥', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_7', name: '🥣 鸡肉玉米泥', madeDate: '2026-05-27', expiryDays: 7 },
   ];
 }
 
@@ -1079,7 +1091,7 @@ const PRESET_FORMULAS = {
   steamCake: {
     name: '🧁 蒸糕',
     ratio: { a: 3, b: 2, c: 1, aLabel: '主食材泥', bLabel: '水', cLabel: '面粉' },
-    standard: '常规取用：90g泥 + 60g水 + 30g面粉 → 调至酸奶稠度',
+    standard: '常规取用：60g泥 + 40g水 + 20g面粉 → 调至酸奶稠度',
     steps: [
       '食材蒸熟，辅食机打细腻泥（肉类/鱼类务必先全熟再打）',
       '按配比加水、加面粉，搅拌均匀',
@@ -1232,6 +1244,8 @@ const ALL_RECIPES = [
   { id: 11, name: '牛肉南瓜饼',    type: 'meatPatty', age: 10, highProtein: true, goodConstipation: false, goodDiarrhea: false, ingredients: [] },
   { id: 12, name: '生苹果泥',       type: 'fruit', age: 7, highProtein: false, goodConstipation: true,  goodDiarrhea: false, ingredients: ['生苹果'] },
   { id: 13, name: '熟苹果泥',       type: 'fruit', age: 7, highProtein: false, goodConstipation: false, goodDiarrhea: true,  ingredients: ['熟苹果'] },
+  { id: 14, name: '鸡肉玉米糕',     type: 'steamCake', age: 9, highProtein: true,  goodConstipation: false, goodDiarrhea: false, ingredients: ['鸡肉', '玉米'] },
+  { id: 15, name: '鸡肉蒸面',       type: 'steamNoodle', age: 9, highProtein: true,  goodConstipation: false, goodDiarrhea: false, ingredients: ['鸡肉'] },
 ];
 
 const TYPE_LABELS = {
@@ -1306,7 +1320,7 @@ function generateList() {
     const r = ALL_RECIPES.find(x => x.id === id);
     if (!r) return;
     html += `<p style="margin:8px 0 2px;font-weight:500;color:#444;font-size:12px;">${r.name}</p>`;
-    if (r.type === 'steamCake') html += `<p style="color:#666;font-size:11px;line-height:1.7;">按 3:2:1 配比（90g泥+60g水+30g面粉），25火力蒸10-15分钟</p>`;
+    if (r.type === 'steamCake') html += `<p style="color:#666;font-size:11px;line-height:1.7;">按 3:2:1 配比（60g泥+40g水+20g面粉），25火力蒸10-15分钟</p>`;
     else if (r.type === 'steamNoodle') html += `<p style="color:#666;font-size:11px;line-height:1.7;">5g面+65g水，煮沸下面+荤料，25火力蒸12分钟，拌入菜泥</p>`;
     else if (r.type === 'meatball') html += `<p style="color:#666;font-size:11px;line-height:1.7;">肉剁碎+淀粉+水搅匀，搓丸子，沸水煮至浮起</p>`;
     else if (r.type === 'meatPatty') html += `<p style="color:#666;font-size:11px;line-height:1.7;">肉碎+蔬菜碎+淀粉搅匀，煎锅小火两面煎熟</p>`;
@@ -1327,6 +1341,8 @@ function generateList() {
     9:{ '🐟 鳕鱼':100,'🌾 淀粉':20 },
     10:{ '🥩 猪肉':80,'🥕 胡萝卜':30,'🌾 淀粉':15 },
     11:{ '🥩 牛肉':80,'🎃 南瓜':50,'🌾 淀粉':15 },
+    14:{ '🥩 鸡肉':100,'🌽 玉米':30,'🌾 面粉':30 },
+    15:{ '🥩 鸡肉':50,'🌾 碎碎面':5 },
   };
   selectedRecipes.forEach(id => {
     if (mapping[id]) for (const [k,v] of Object.entries(mapping[id])) ingredients[k] = (ingredients[k]||0) + v;
