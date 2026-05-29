@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>宝宝辅食小厨房</title>
+<style>
+/* ========== RESET & BASE ========== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --pink: #f47da8;
+  --pink-light: #f8a4b8;
+  --green: #5a9a5a;
+  --green-light: #7bc47f;
+  --blue: #4a7ad9;
+  --blue-light: #7bc8e8;
+  --purple: #a47ad8;
+  --purple-light: #c8a8f8;
+  --orange: #f0a43a;
+  --orange-light: #f8c87a;
+  --red: #d45a5a;
+  --warn: #c47a3a;
+  --bg: #f0ede8;
+  --card: #ffffff;
+  --text: #333333;
+  --muted: #999999;
+  --border: #e8e5e0;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --radius-xs: 6px;
+}
+html { font-size: 16px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== UTILITIES ========== */
+.tag { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 10.5px; font-weight: 500; }
+.tag-green { background: #e6f4e6; color: var(--green); }
+.tag-orange { background: #fef6e8; color: var(--warn); }
+.tag-red { background: #ffe8e8; color: var(--red); }
+.tag-blue { background: #e8f0fe; color: var(--blue); }
+.tag-pink { background: #ffe8f0; color: #c44a8a; }
+
+.card { background: var(--card); border-radius: var(--radius); overflow: hidden; margin: 0 12px 14px; box-shadow: var(--shadow); }
+
+.btn-primary { background: linear-gradient(135deg, var(--orange-light), var(--orange)); color: white; border: none; border-radius: var(--radius-sm); padding: 11px 0; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; width: 100%; box-shadow: 0 2px 8px rgba(240,164,58,0.3); }
+.btn-secondary { background: rgba(255,255,255,0.25); color: white; border: none; border-radius: 8px; padding: 5px 10px; font-size: 11px; font-weight: 600; cursor: pointer; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.btn-sm { background: #f5f5f3; color: #666; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; }
+.btn-sm.danger { background: #fff0f0; color: #d45a5a; }
+
+/* ========== SECTION 1: HEADER ========== */
+.header {
+  background: linear-gradient(135deg, var(--pink-light), var(--pink));
+  color: white;
+  border-radius: 20px;
+  padding: 20px 20px 18px;
+  margin: 16px 12px 14px;
+  box-shadow: 0 4px 16px rgba(244,125,168,0.25);
+}
+.header h1 { font-size: 18px; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 4px; }
+.header .subtitle { font-size: 12px; opacity: 0.9; }
+.header .dob { font-size: 11px; opacity: 0.7; margin-top: 4px; }
+
+/* ========== SECTION 2: STATUS SWITCH ========== */
+.status-card { padding: 14px 16px; }
+.status-label { font-size: 12px; color: #999; font-weight: 600; margin-bottom: 10px; }
+.status-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.status-btn {
+  border-radius: 20px; padding: 6px 14px; font-size: 12.5px; border: 1.5px solid; cursor: pointer; transition: all 0.2s;
+  background: var(--card); color: #aaa; border-color: #ddd; font-weight: 400;
+}
+.status-btn.active-normal { background: #f0f4ff; color: var(--blue); border-color: var(--blue); font-weight: 600; }
+.status-btn.active-dermatitis { background: #fff0f0; color: var(--red); border-color: var(--red); font-weight: 600; }
+.status-btn.active-diarrhea { background: #f0f4ff; color: var(--blue); border-color: var(--blue); font-weight: 600; }
+.status-btn.active-constipation { background: #fef6e8; color: var(--warn); border-color: var(--warn); font-weight: 600; }
+.status-warn { margin-top: 10px; background: #fff8f0; border-radius: 8px; padding: 8px 10px; font-size: 11px; color: var(--warn); display: none; }
+
+/* ========== SECTION 3: WEEKLY PLAN ========== */
+.plan-header {
+  background: linear-gradient(135deg, #a8d8a8, var(--green-light));
+  color: white; padding: 13px 16px; display: flex; align-items: center; justify-content: space-between;
+}
+.plan-header h2 { font-size: 15px; font-weight: 700; }
+.plan-header .plan-meta { font-size: 11px; opacity: 0.9; margin-top: 3px; }
+.plan-scroll { max-height: 460px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 8px; }
+/* 每日卡片外框 */
+.plan-day-wrap { margin: 0 10px 10px; border-radius: var(--radius-sm); overflow: hidden; }
+.plan-day-wrap.prep { border: 2px solid var(--pink-light); background: #fff8fa; }
+.plan-day-wrap.normal { border: 1px solid #f0ede8; }
+/* 日标题 */
+.day-bar { padding: 8px 14px; display: flex; align-items: center; gap: 8px; }
+.plan-day-wrap.prep .day-bar { background: linear-gradient(135deg, var(--pink-light), var(--pink)); color: white; }
+.plan-day-wrap.normal .day-bar { background: #fafaf8; }
+.day-bar .day-name { font-size: 13px; font-weight: 700; }
+.plan-day-wrap.normal .day-bar .day-name { color: var(--text); }
+.day-bar .day-tag { background: rgba(255,255,255,0.3); border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 600; }
+.plan-day-wrap.normal .day-tag { background: #e8f4e8; color: var(--green); }
+/* 备菜内容 - 三级结构 */
+.prep-content { padding: 8px 14px 4px; }
+.prep-level { margin-bottom: 10px; }
+.level-head { display: inline; font-size: 13px; font-weight: 700; color: #555; vertical-align: middle; }
+.level-body { font-size: 13px; font-weight: 700; color: var(--text); padding: 6px 0 4px; line-height: 1.6; }
+.prep-flow { padding: 6px 0 2px; }
+.flow-main { font-size: 12px; color: var(--pink); font-weight: 600; padding: 4px 0; }
+.flow-branch { padding-left: 4px; }
+.flow-item { font-size: 11.5px; color: #666; line-height: 1.8; }
+.flow-tip { font-size: 11px; color: #b47a2a; background: #fef8ec; border-left: 3px solid #f0c060; border-radius: 4px; padding: 4px 8px; margin: 4px 0 6px; line-height: 1.6; }
+.flow-legend { background: #faf8f5; border-radius: 8px; padding: 8px 10px; margin-top: 8px; border: 1px solid #f0ede8; }
+.prep-methods { display: flex; flex-direction: column; gap: 6px; padding: 4px 0; }
+.method-card { background: #faf8f5; border-radius: 8px; padding: 8px 10px; border-left: 3px solid var(--pink-light); }
+.method-title { font-size: 12.5px; font-weight: 700; color: #c44a8a; margin-bottom: 2px; }
+.method-detail { font-size: 11px; color: #777; line-height: 1.6; }
+.prep-derma-banner { background: #fff5f5; border: 1px solid #ffd0d0; border-radius: 6px; padding: 6px 10px; margin-bottom: 8px; font-size: 11px; color: #c44a4a; line-height: 1.5; }
+/* 状态推荐横幅 */
+.status-banner { margin: 0 14px 10px; border-radius: 10px; padding: 10px 14px; }
+.status-banner-constipation { background: #fef8f0; border: 1px solid #f0d4a0; }
+.status-banner-diarrhea { background: #f0f6fe; border: 1px solid #b8d4f0; }
+.status-banner-mixed { background: #f8f0fa; border: 1px solid #d4b8e0; }
+.status-banner-title { font-size: 12px; font-weight: 700; margin-bottom: 4px; }
+.status-banner-constipation .status-banner-title { color: #c4852a; }
+.status-banner-diarrhea .status-banner-title { color: #4a8fc4; }
+.status-banner-mixed .status-banner-title { color: #7a4a9e; }
+.status-banner-list { font-size: 11px; color: #666; line-height: 1.6; }
+/* 每日餐食 */
+.day-meals { padding: 8px 14px; }
+.meal-line { font-size: 12px; color: #555; line-height: 1.8; }
+.meal-line .fresh { color: var(--green); font-size: 10.5px; }
+.meal-line .fresh-meatball { color: var(--warn); font-size: 10.5px; font-weight: 600; }
+.meal-line .frozen { color: #888; font-size: 10.5px; }
+.meal-line .suggest { color: var(--purple); font-size: 10.5px; }
+.nutrition-tags { display: flex; gap: 5px; flex-wrap: wrap; padding: 6px 14px 10px; }
+/* 滚屏提示 */
+.week-divider { margin: 4px 10px; border-top: 2px dashed #e0dcd5; text-align: center; }
+.week-divider span { background: var(--bg); color: #ccc; font-size: 10px; padding: 0 8px; position: relative; top: -8px; }
+.scroll-hint { padding: 10px 16px 4px; text-align: center; color: #ccc; font-size: 11.5px; }
+
+/* ========== SECTION 4: FRIDGE ========== */
+.fridge-header {
+  background: linear-gradient(135deg, var(--blue-light), var(--blue));
+  color: white; padding: 13px 16px;
+}
+.fridge-header h2 { font-size: 15px; font-weight: 700; }
+.fridge-header .fridge-meta { font-size: 11px; opacity: 0.9; margin-top: 3px; }
+.fridge-item { display: flex; align-items: center; justify-content: space-between; padding: 11px 16px; border-bottom: 1px solid #f5f5f3; gap: 8px; }
+.fridge-item:last-child { border-bottom: none; }
+.fridge-item .item-info { flex: 1; min-width: 0; }
+.fridge-item .item-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.fridge-item .item-meta { font-size: 11px; color: #aaa; margin-top: 3px; }
+.fridge-badge { border-radius: 6px; padding: 4px 9px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+.badge-ok { background: #e6f4e6; color: var(--green); }
+.badge-warn { background: #fef0e0; color: var(--warn); }
+.badge-danger { background: #ffe8e8; color: var(--red); }
+.fridge-add { padding: 10px 16px; border-top: 1px solid #f5f5f3; }
+.fridge-del { font-size: 18px; color: #ccc; cursor: pointer; padding: 0 4px; line-height: 1; }
+.fridge-del:hover { color: var(--red); }
+
+/* ========== SECTION 5: FORMULA TABS ========== */
+.formula-header {
+  background: linear-gradient(135deg, var(--purple-light), var(--purple));
+  color: white; padding: 13px 16px;
+}
+.formula-header h2 { font-size: 15px; font-weight: 700; }
+.formula-tabs { display: flex; border-bottom: 2px solid #f0ede8; }
+.ftab {
+  flex: 1; text-align: center; padding: 10px 0; font-size: 12.5px; cursor: pointer;
+  color: #bbb; border-bottom: 2.5px solid transparent; transition: all 0.2s;
+}
+.ftab.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 600; background: #faf8ff; }
+.ftab.add-tab { flex: 0.7; font-size: 15px; color: #ccc; }
+.ftab.add-tab:hover { color: var(--purple); }
+.formula-body { padding: 14px 16px; font-size: 12px; line-height: 1.9; color: #555; }
+.formula-title { font-size: 13px; font-weight: 600; color: #444; margin-bottom: 6px; }
+.formula-ratio {
+  background: linear-gradient(135deg, #f0ecf8, #e8e0f8);
+  border-radius: var(--radius-sm); padding: 10px 14px; text-align: center; margin-bottom: 10px;
+}
+.formula-ratio .num { font-size: 16px; font-weight: 700; color: var(--purple); }
+.formula-ratio .label { color: #888; margin: 0 3px; font-size: 12px; }
+.formula-note { margin-top: 8px; font-size: 11px; color: #aaa; }
+
+/* ========== SECTION 6: INSPIRATION ========== */
+.inspire-header {
+  background: linear-gradient(135deg, var(--orange-light), var(--orange));
+  color: white; padding: 13px 16px;
+}
+.inspire-header h2 { font-size: 15px; font-weight: 700; }
+.inspire-header .inspire-meta { font-size: 11px; opacity: 0.9; margin-top: 3px; }
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; padding: 12px 16px; }
+.filter-tag { border-radius: 5px; padding: 3px 8px; font-size: 10.5px; cursor: pointer; transition: all 0.2s; }
+.filter-tag.active { background: var(--orange); color: white; font-weight: 600; }
+.filter-tag.inactive { background: #f5f5f3; color: #666; border: none; }
+.recipe-card {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  background: #fafaf8; border-radius: var(--radius-sm); border: 0.5px solid #eee;
+  margin: 0 16px 8px; cursor: pointer; transition: all 0.2s;
+}
+.recipe-card.selected { border-color: var(--purple); background: #f8f6ff; }
+.recipe-check { font-size: 15px; color: #ccc; }
+.recipe-card.selected .recipe-check { color: var(--purple); font-weight: 700; }
+.recipe-name { font-size: 12.5px; font-weight: 500; color: #444; }
+.recipe-meta { font-size: 10.5px; color: #aaa; margin-top: 2px; }
+.derma-warn { font-size: 10px; color: var(--red); font-weight: 600; }
+.constipation-tag { font-size: 10px; color: #c4852a; font-weight: 600; }
+.diarrhea-tag { font-size: 10px; color: #4a8fc4; font-weight: 600; }
+.result-box { margin: 12px 16px 0; background: #fafaf8; border-radius: var(--radius-sm); padding: 12px; border: 1px solid #eee; display: none; }
+.result-box h3 { font-size: 12.5px; font-weight: 600; color: #444; margin-bottom: 6px; }
+.result-box hr { border: none; border-top: 1px dashed #ddd; margin: 10px 0; }
+
+/* ========== MODAL ========== */
+.modal-overlay {
+  display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4); z-index: 100; align-items: center; justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal-box {
+  background: white; border-radius: var(--radius); padding: 20px; width: 85%; max-width: 320px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+}
+.modal-box h3 { font-size: 15px; font-weight: 600; margin-bottom: 14px; color: #444; }
+.modal-box label { font-size: 12px; color: #666; display: block; margin-bottom: 4px; }
+.modal-box input, .modal-box textarea {
+  width: 100%; border: 1px solid #ddd; border-radius: 8px; padding: 8px 10px;
+  font-size: 13px; font-family: inherit; margin-bottom: 12px; outline: none;
+}
+.modal-box input:focus, .modal-box textarea:focus { border-color: var(--purple); }
+.modal-actions { display: flex; gap: 8px; margin-top: 8px; }
+.modal-btn { flex: 1; border-radius: 8px; padding: 9px 0; text-align: center; font-size: 13px; font-weight: 600; cursor: pointer; border: none; }
+.modal-btn.confirm { background: var(--purple); color: white; }
+.modal-btn.cancel { background: #f5f5f3; color: #666; }
+
+/* ========== MISC ========== */
+.footer { text-align: center; padding: 6px 0 24px; font-size: 10.5px; color: #ccc; }
+</style>
+</head>
+<body>
+
+<!-- ==================== SECTION 1: HEADER ==================== -->
+<div class="header" id="header">
+  <h1 id="header-title">🥣 宝宝辅食小厨房</h1>
+  <p class="subtitle" id="header-subtitle">计算中...</p>
+  <p class="dob" id="header-dob">出生 2025.08.05 · 自动计算月龄</p>
+</div>
+
+<!-- ==================== SECTION 2: STATUS SWITCH ==================== -->
+<div class="card" id="status-card">
+  <div class="status-card">
+    <p class="status-label">宝宝当前状态 · 可多选</p>
+    <div class="status-row" id="status-row">
+      <div class="status-btn active-normal" data-status="normal" onclick="toggleStatus('normal')">☑ 正常</div>
+      <div class="status-btn inactive" data-status="dermatitis" onclick="toggleStatus('dermatitis')">☐ 皮炎活跃期</div>
+      <div class="status-btn inactive" data-status="diarrhea" onclick="toggleStatus('diarrhea')">☐ 拉肚子</div>
+      <div class="status-btn inactive" data-status="constipation" onclick="toggleStatus('constipation')">☐ 便秘</div>
+    </div>
+    <div class="status-warn" id="status-warn">⚠️ 皮炎期已开启，高蛋白食谱已标注提醒</div>
+  </div>
+</div>
+
+<!-- ==================== SECTION 3: WEEKLY PLAN ==================== -->
+<div class="card" id="plan-card">
+  <div class="plan-header">
+    <div>
+      <h2>📅 一周辅食计划</h2>
+      <p class="plan-meta" id="plan-meta">计算中...</p>
+    </div>
+    <button class="btn-secondary" onclick="showIngredientPicker()">🔄 换主食材</button>
+  </div>
+  <div class="plan-scroll" id="plan-scroll">
+    <!-- JS 动态生成 -->
+  </div>
+</div>
+
+<!-- ==================== SECTION 4: FRIDGE ==================== -->
+<div class="card" id="fridge-card">
+  <div class="fridge-header">
+    <h2>🧊 冰箱库存</h2>
+    <p class="fridge-meta">保鲜期 7 天 · 到期自动预警</p>
+  </div>
+  <div id="fridge-list">
+    <!-- JS 动态生成 -->
+  </div>
+  <div class="fridge-add" style="text-align:center;">
+    <button class="btn-sm" onclick="showAddFridgeModal()" style="width:100%;padding:9px;">＋ 添加库存</button>
+  </div>
+</div>
+
+<!-- ==================== SECTION 5: FORMULA TABS ==================== -->
+<div class="card" id="formula-card">
+  <div class="formula-header">
+    <h2>🍳 核心公式</h2>
+  </div>
+  <div class="formula-tabs" id="formula-tabs">
+    <div class="ftab active" data-tab="steamCake" onclick="switchFormulaTab('steamCake')">🧁 蒸糕</div>
+    <div class="ftab" data-tab="steamNoodle" onclick="switchFormulaTab('steamNoodle')">🍜 蒸面</div>
+    <div class="ftab" data-tab="porridge" onclick="switchFormulaTab('porridge')">🥣 粥</div>
+    <div class="ftab add-tab" onclick="showAddFormulaModal()">＋</div>
+  </div>
+  <div class="formula-body" id="formula-body">
+    <!-- JS 动态生成 -->
+  </div>
+</div>
+
+<!-- ==================== SECTION 6: INSPIRATION RECIPES ==================== -->
+<div class="card" id="inspire-card">
+  <div class="inspire-header">
+    <h2>💡 灵感食谱</h2>
+    <p class="inspire-meta">勾选心仪食谱，生成做法 + 采购清单</p>
+  </div>
+  <div class="filter-row" id="inspire-filters">
+    <!-- JS 动态生成 -->
+  </div>
+  <div id="recipe-list">
+    <!-- JS 动态生成 -->
+  </div>
+  <div style="padding: 0 16px 14px;">
+    <button class="btn-primary" onclick="generateList()">✅ 确认选择 → 生成清单</button>
+  </div>
+  <div class="result-box" id="result-box">
+    <!-- JS 动态生成 -->
+  </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="footer">由 WorkBuddy 维护 · 更新请联系 winniezhang</div>
+
+<!-- ==================== MODALS ==================== -->
+<!-- 换主食材弹窗 -->
+<div class="modal-overlay" id="ingredient-modal">
+  <div class="modal-box">
+    <h3>🔄 选择主食材</h3>
+    <div id="ingredient-options" style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;"></div>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal('ingredient-modal')">取消</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新增公式弹窗 -->
+<div class="modal-overlay" id="formula-modal">
+  <div class="modal-box">
+    <h3>＋ 新增公式</h3>
+    <label>名称（含 emoji）</label>
+    <input type="text" id="fm-name" placeholder="例如：🍖 肉丸">
+    <label>配比说明</label>
+    <input type="text" id="fm-ratio" placeholder="例如：肉:淀粉:水 = 5:2:1">
+    <label>制作步骤（每行一条）</label>
+    <textarea id="fm-steps" rows="4" placeholder="1. xxx&#10;2. xxx"></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal('formula-modal')">取消</button>
+      <button class="modal-btn confirm" onclick="addFormulaTab()">确认添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- 新增冰箱库存弹窗 -->
+<div class="modal-overlay" id="fridge-modal">
+  <div class="modal-box">
+    <h3>＋ 添加冰箱库存</h3>
+    <label>辅食名称（含 emoji）</label>
+    <input type="text" id="fr-name" placeholder="例如：🧁 山药红枣糕">
+    <label>制作日期</label>
+    <input type="date" id="fr-date">
+    <div class="modal-actions">
+      <button class="modal-btn cancel" onclick="closeModal('fridge-modal')">取消</button>
+      <button class="modal-btn confirm" onclick="addFridgeItem()">确认添加</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== JAVASCRIPT ==================== -->
+<script>
+// ============================================================
+// DATA: BIRTH DATE & AUTO AGE
+// ============================================================
+const BIRTH_DATE = new Date('2025-08-05');
+
+function calcAge() {
+  const now = new Date();
+  const birth = BIRTH_DATE;
+  let months = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+  if (now.getDate() < birth.getDate()) months--;
+  let nextMonths = months + 1;
+  return { current: months, next: nextMonths };
+}
+
+function getStage(months) {
+  if (months < 9) return '初添期';
+  if (months < 10) return '手指食物期';
+  if (months < 12) return '炖烂肉期';
+  return '家庭饮食过渡期';
+}
+
+function updateHeader() {
+  const age = calcAge();
+  const stage = getStage(age.current);
+  document.getElementById('header-subtitle').textContent = `${age.current}月龄 · ${stage}`;
+}
+
+// ============================================================
+// DATA: STATUS
+// ============================================================
+let activeStatuses = ['normal'];
+
+function toggleStatus(type) {
+  const idx = activeStatuses.indexOf(type);
+  if (type === 'normal') {
+    if (idx >= 0 && activeStatuses.length > 1) {
+      activeStatuses = ['normal'];
+    } else if (idx < 0) {
+      activeStatuses = ['normal'];
+    }
+  } else {
+    if (idx >= 0) {
+      activeStatuses.splice(idx, 1);
+    } else {
+      activeStatuses.push(type);
+    }
+    if (activeStatuses.length === 0) activeStatuses = ['normal'];
+  }
+  renderStatus();
+  filterRecipes();
+  renderWeeklyPlan();
+  localStorage.setItem('babyStatus', JSON.stringify(activeStatuses));
+}
+
+function renderStatus() {
+  const btns = document.querySelectorAll('#status-row .status-btn');
+  btns.forEach(btn => {
+    const t = btn.dataset.status;
+    btn.className = 'status-btn';
+    if (activeStatuses.includes(t)) {
+      btn.classList.add('active-' + t);
+      const symbols = { normal: '☑', dermatitis: '☑', diarrhea: '☑', constipation: '☑' };
+      btn.textContent = symbols[t] + ' ' + { normal: '正常', dermatitis: '皮炎活跃期', diarrhea: '拉肚子', constipation: '便秘' }[t];
+    } else {
+      btn.classList.add('inactive');
+      const symbols = { normal: '☐', dermatitis: '☐', diarrhea: '☐', constipation: '☐' };
+      btn.textContent = symbols[t] + ' ' + { normal: '正常', dermatitis: '皮炎活跃期', diarrhea: '拉肚子', constipation: '便秘' }[t];
+    }
+  });
+  const warn = document.getElementById('status-warn');
+  if (activeStatuses.includes('dermatitis')) {
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
+}
+
+// ============================================================
+// DATA: WEEKLY PLAN - 动态生成
+// ============================================================
+let currentMainIngredient = '山药';
+
+// 每种主食材的一周计划模板
+const PLAN_TEMPLATES = {
+  '山药': {
+    pair: '红枣',
+    sweet: ['红枣', '胡萝卜'],
+    prepCakeName: '山药红枣糕',
+    prepCakeIngredients: '60g 山药泥 + 20g 红枣',
+    freezeUse: '周三蒸面 / 周日蒸面',
+    plans: [
+      { day:'周一', isPrep:true },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜山药蒸面',frozen:'山药红枣糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花山药蒸面',frozen:'山药红枣泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜山药蒸面',frozen:'山药红枣糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'猪肉山药蒸面',frozen:'山药红枣泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'山药猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'山药红枣糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'胡萝卜猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'山药红枣糕',frozenDay:'周一'}] },
+    ]
+  },
+  '南瓜': {
+    pair: '猪肉',
+    sweet: ['南瓜', '胡萝卜'],
+    prepCakeName: '南瓜猪肉蒸糕',
+    prepCakeIngredients: '60g 南瓜泥 + 30g 猪肉碎',
+    freezeUse: '周三蒸面 / 周日蒸面',
+    plans: [
+      { day:'周一', isPrep:true },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜南瓜蒸面',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花南瓜蒸面',frozen:'南瓜泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'山药南瓜蒸面',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'猪肉南瓜蒸面',frozen:'南瓜泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'胡萝卜猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'南瓜猪肉糕',frozenDay:'周一'}] },
+    ]
+  },
+  '胡萝卜': {
+    pair: '山药',
+    sweet: ['胡萝卜', '南瓜'],
+    prepCakeName: '胡萝卜蒸糕',
+    prepCakeIngredients: '60g 胡萝卜泥 + 20g 山药泥',
+    freezeUse: '周三蒸面 / 周日蒸面',
+    plans: [
+      { day:'周一', isPrep:true },
+      { day:'周二', meals:[{time:'午餐',fresh:'山药胡萝卜蒸面',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花胡萝卜蒸面',frozen:'胡萝卜泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜胡萝卜蒸面',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'猪肉胡萝卜蒸面',frozen:'胡萝卜泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'山药猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'胡萝卜蒸糕',frozenDay:'周一'}] },
+    ]
+  },
+  '西兰花': {
+    pair: '胡萝卜',
+    sweet: ['胡萝卜', '南瓜'],
+    prepCakeName: '西兰花胡萝卜蒸糕',
+    prepCakeIngredients: '60g 西兰花泥 + 15g 胡萝卜泥',
+    freezeUse: '周三蒸面 / 周日蒸面',
+    plans: [
+      { day:'周一', isPrep:true },
+      { day:'周二', meals:[{time:'午餐',fresh:'南瓜西兰花蒸面',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'山药西兰花蒸面',frozen:'西兰花泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'胡萝卜西兰花蒸面',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'猪肉西兰花蒸面',frozen:'西兰花泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'南瓜猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'胡萝卜猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'西兰花胡萝卜糕',frozenDay:'周一'}] },
+    ]
+  },
+  '猪肉': {
+    pair: '胡萝卜',
+    sweet: ['胡萝卜', '南瓜', '红枣'],
+    prepCakeName: '猪肉胡萝卜蒸糕',
+    prepCakeIngredients: '100g 猪肉碎 → 60g做蒸糕 + 剩余冷冻囤货',
+    freezeUse: '周三蒸面 / 周日蒸面',
+    plans: [
+      { day:'周一', isPrep:true },
+      { day:'周二', meals:[{time:'午餐',fresh:'山药猪肉蒸面',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面',frozen:'猪肉碎',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜猪肉蒸面',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'胡萝卜猪肉蒸面',frozen:'猪肉碎',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'山药猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'西兰花猪肉蒸面',frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'猪肉胡萝卜糕',frozenDay:'周一'}] },
+    ]
+  },
+  '牛肉': {
+    pair: '南瓜',
+    sweet: ['南瓜', '胡萝卜', '红枣'],
+    prepCakeName: '牛肉南瓜糕',
+    prepCakeIngredients: '100g 牛肉碎 → 60g做蒸糕 + 剩余冷冻囤货',
+    freezeUse: '周三蒸面 / 周日烩饭',
+    plans: [
+      { day:'周一', isPrep:true },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜牛肉蒸面',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花牛肉蒸面',frozen:'牛肉碎',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'山药牛肉蒸面',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'牛肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'南瓜牛肉烩饭（10M+）',frozen:'牛肉碎',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'胡萝卜牛肉蒸面',frozen:'牛肉丸',frozenDay:'周五'},{time:'午餐',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'西兰花牛肉蒸面',frozen:'牛肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'牛肉南瓜糕',frozenDay:'周一'}] },
+    ]
+  },
+  '鳕鱼': {
+    pair: '西兰花',
+    sweet: ['胡萝卜', '南瓜'],
+    prepCakeName: '鳕鱼玉米糕',
+    prepCakeIngredients: '80g 鳕鱼泥 + 20g 玉米碎 → 60g做蒸糕 + 剩余冷冻囤货',
+    freezeUse: '周三蒸面 / 周日蒸面',
+    plans: [
+      { day:'周一', isPrep:true },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜鳕鱼蒸面',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花鳕鱼蒸面',frozen:'鳕鱼泥',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜鳕鱼蒸面',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'鳕鱼丸（批量制作冷冻备用）'},{time:'午餐',fresh:'胡萝卜鳕鱼蒸面',frozen:'鳕鱼泥',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'西兰花鳕鱼蒸面',frozen:'鳕鱼丸',frozenDay:'周五'},{time:'午餐',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'南瓜鳕鱼蒸面',frozen:'鳕鱼丸',frozenDay:'周五'},{time:'晚餐',frozen:'鳕鱼玉米糕',frozenDay:'周一'}] },
+    ]
+  },
+  '鸡肉': {
+    pair: '玉米',
+    sweet: ['玉米', '胡萝卜', '南瓜'],
+    prepCakeName: '鸡肉玉米糕',
+    prepCakeIngredients: '100g 鸡肉碎 → 60g做蒸糕 + 剩余冷冻囤货',
+    freezeUse: '周三蒸面 / 周日蒸面',
+    plans: [
+      { day:'周一', isPrep:true },
+      { day:'周二', meals:[{time:'午餐',fresh:'胡萝卜鸡肉蒸面',frozen:'鸡肉玉米糕',frozenDay:'周一'}] },
+      { day:'周三', meals:[{time:'午餐',fresh:'西兰花鸡肉蒸面',frozen:'鸡肉碎',frozenDay:'周一'}] },
+      { day:'周四', meals:[{time:'午餐',fresh:'南瓜鸡肉蒸面',frozen:'鸡肉玉米糕',frozenDay:'周一'}] },
+      { day:'周五', meals:[{time:'午餐',fresh:'鸡肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:'玉米鸡肉蒸面',frozen:'鸡肉碎',frozenDay:'周一'}] },
+      { day:'周六', meals:[{time:'午餐',fresh:'胡萝卜鸡肉蒸面',frozen:'鸡肉丸',frozenDay:'周五'},{time:'午餐',frozen:'鸡肉玉米糕',frozenDay:'周一'}] },
+      { day:'周日', meals:[{time:'午餐',fresh:'西兰花鸡肉蒸面',frozen:'鸡肉丸',frozenDay:'周五'},{time:'晚餐',frozen:'鸡肉玉米糕',frozenDay:'周一'}] },
+    ]
+  },
+
+};
+
+// 预设主食材列表
+const PRESET_INGREDIENTS = ['山药', '南瓜', '胡萝卜', '西兰花', '猪肉', '牛肉', '鳕鱼', '鸡肉'];
+
+function buildPlanNutrition(plan, template) {
+  // 判断每天的营养搭配
+  let meat = false, veg = false, grain = false, sweet = null;
+  const meatWords = ['猪肉', '鳕鱼', '牛肉', '鸡肉', '鱼肉', '虾', '肉'];
+  const vegWords = ['西兰花', '胡萝卜', '南瓜', '山药', '菠菜', '青菜'];
+  const sweetWords = ['红枣', '南瓜', '胡萝卜', '玉米'];
+
+  if (plan.isPrep) {
+    // 备菜日：从模板的菜谱名/配料中判断是否含肉
+    const prepText = (template.prepCakeName || '') + (template.prepCakeIngredients || '');
+    if (meatWords.some(w => prepText.includes(w))) meat = true;
+    veg = true; grain = true; sweet = template.pair;
+  } else if (plan.meals) {
+    plan.meals.forEach(m => {
+      const txt = (m.fresh||'') + (m.suggest||'') + (m.frozen||'');
+      if (meatWords.some(w => txt.includes(w))) meat = true;
+      if (vegWords.some(w => txt.includes(w))) veg = true;
+      grain = true; // 蒸糕/蒸面都是淀粉
+      sweetWords.forEach(w => { if (txt.includes(w) || template.sweet.includes(w)) sweet = w; });
+    });
+  }
+  if (!sweet) sweet = template.sweet[0];
+  return { meat, veg, grain, sweet };
+}
+
+// 高蛋白食材检测词（皮炎期触发）
+const HIGH_PROTEIN_WORDS = ['猪肉', '鳕鱼', '牛肉', '鸡肉', '鱼肉', '虾', '肉丸', '肉碎', '肉饼'];
+function hasHighProtein(text) {
+  return HIGH_PROTEIN_WORDS.some(w => text.includes(w));
+}
+function isDermaActive() {
+  return activeStatuses.includes('dermatitis');
+}
+
+function renderWeeklyPlan() {
+  const scroll = document.getElementById('plan-scroll');
+  const template = PLAN_TEMPLATES[currentMainIngredient];
+  if (!template) { scroll.innerHTML = '<p style="text-align:center;color:#aaa;padding:20px;">暂无该食材的周计划</p>'; return; }
+
+  const now = new Date();
+  const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - dayOfWeek + 1);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  const rangeStr = `${monday.getMonth()+1}/${monday.getDate()} - ${sunday.getMonth()+1}/${sunday.getDate()}`;
+  document.getElementById('plan-meta').textContent = `${rangeStr} · ${currentMainIngredient}为主食材`;
+
+  let html = '';
+
+  // ---- 状态相关饮食建议 ----
+  const isConstipation = activeStatuses.includes('constipation');
+  const isDiarrhea = activeStatuses.includes('diarrhea');
+  if (isConstipation || isDiarrhea) {
+    const recs = ALL_RECIPES.filter(r => {
+      if (isConstipation && isDiarrhea) return r.goodConstipation || r.goodDiarrhea;
+      if (isConstipation) return r.goodConstipation;
+      return r.goodDiarrhea;
+    });
+    if (recs.length > 0) {
+      // 提取元食材去重
+      const allIngs = [];
+      recs.forEach(r => { if (r.ingredients) allIngs.push(...r.ingredients); });
+      const uniqueIngs = [...new Set(allIngs)].slice(0, 6);
+      const names = uniqueIngs.join('、');
+      let bannerCls, icon, label;
+      if (isConstipation && isDiarrhea) {
+        bannerCls = 'status-banner-mixed'; icon = '💩🛡️'; label = '便秘 + 拉肚子';
+      } else if (isConstipation) {
+        bannerCls = 'status-banner-constipation'; icon = '💩'; label = '便秘';
+      } else {
+        bannerCls = 'status-banner-diarrhea'; icon = '🛡️'; label = '拉肚子';
+      }
+      html += `<div class="status-banner ${bannerCls}">`;
+      html += `<p class="status-banner-title">${icon} 宝宝正在${label}，推荐吃这些 →</p>`;
+      html += `<p class="status-banner-list">${names}</p>`;
+      html += `</div>`;
+    }
+  }
+
+  template.plans.forEach((plan, i) => {
+    const nutrition = buildPlanNutrition(plan, template);
+    const isPrep = plan.isPrep;
+    const wrapCls = isPrep ? 'prep' : 'normal';
+
+    html += `<div class="plan-day-wrap ${wrapCls}">`;
+
+    // 日标题
+    html += `<div class="day-bar">`;
+    html += `<span class="day-name">${plan.day}</span>`;
+    if (isPrep) html += `<span class="day-tag">备菜日</span>`;
+    if (!isPrep) html += `<span class="day-tag" style="background:#e3f0fd;color:#3a7cc3;">🧊 冰箱取</span>`;
+    html += `</div>`;
+
+    if (isPrep) {
+      // ---- 备菜日：三级结构（菜名 → 流程 → 制作方式） ----
+      const prepNums = template.prepCakeIngredients.match(/\d+/g) || [];
+      const mainG = parseInt(prepNums[0]) || 90;
+      const waterG = Math.round(mainG * 2 / 3);
+      const flourG = Math.round(mainG / 3);
+      const cakeTotalG = mainG + waterG + flourG;
+      const isDerma = isDermaActive();
+      const mainIsHighPro = hasHighProtein(currentMainIngredient);
+      const isMeat = ['猪肉', '牛肉', '鸡肉'].includes(currentMainIngredient);
+      const isFish = currentMainIngredient === '鳕鱼';
+
+      html += `<div class="prep-content">`;
+      // 皮炎期高蛋白提醒
+      if (isDerma && mainIsHighPro) {
+        html += `<div class="prep-derma-banner"><span class="derma-warn">⚠️ 皮炎期慎用</span> 本周主食材 <b>${currentMainIngredient}</b> 为高蛋白食材，请注意观察宝宝皮肤反应</div>`;
+      }
+
+      // ===== 今日制作菜名 =====
+      const menuItems = [`${currentMainIngredient}蒸面`, template.prepCakeName];
+      html += `<div class="prep-level l1">`;
+      html += `<div class="level-head">📋 今日制作菜名</div>`;
+      html += `<div class="level-body">${menuItems.join(' + ')}</div>`;
+      html += `</div>`;
+
+      // ===== 统一备菜流程 =====
+      html += `<div class="prep-level l2">`;
+      html += `<div class="level-head">📐 统一备菜流程</div>`;
+      html += `<div class="prep-flow">`;
+      if (isMeat || isFish) {
+        const meatPair = template.pair || '';
+        const meatBlendTip = meatPair && !isFish
+          ? `<div class="flow-tip">💡 打泥顺序：先打${currentMainIngredient}（较硬/需全熟），再加入${meatPair}（蔬菜）混合打</div>`
+          : (isFish ? `<div class="flow-tip">💡 打泥顺序：鳕鱼先蒸全熟，去刺后打泥</div>` : '');
+        html += `<div class="flow-main">${template.prepCakeIngredients}</div>`;
+        if (meatBlendTip) html += meatBlendTip;
+        html += `<div class="flow-branch">`;
+        html += `<div class="flow-item">├─ 做蒸糕：${template.prepCakeName}</div>`;
+        html += `<div class="flow-item">└─ 残余 + 少许配菜 → 当天蒸面配菜</div>`;
+        html += `</div>`;
+      } else {
+        const totalPuree = mainG + 10;
+        const hasPair = template.pair && !['猪肉','牛肉','鳕鱼'].includes(template.pair);
+        const blendTip = hasPair
+          ? `<div class="flow-tip">💡 打泥顺序：先打${currentMainIngredient}（水分少/较硬），再加入${template.pair}（水分多）</div>`
+          : '';
+        html += `<div class="flow-main">${totalPuree}g ${currentMainIngredient}泥 → 辅食机打泥后分流</div>`;
+        if (blendTip) html += blendTip;
+        html += `<div class="flow-branch">`;
+        html += `<div class="flow-item">├─ 10g → 单独冷冻备用（${template.freezeUse}）</div>`;
+        html += `<div class="flow-item">├─ ${mainG}g → 做蒸糕</div>`;
+        html += `<div class="flow-item">└─ 残余 + 少许配菜 → 当天蒸面配菜</div>`;
+        html += `</div>`;
+      }
+      html += `</div></div>`;
+
+      // ===== 制作方式 =====
+      const cakeHighPro = isDerma && hasHighProtein(template.prepCakeName + template.prepCakeIngredients);
+      html += `<div class="prep-level l3">`;
+      html += `<div class="level-head">🔧 制作方式</div>`;
+      html += `<div class="prep-methods">`;
+      // 蒸面
+      html += `<div class="method-card">`;
+      html += `<div class="method-title">🍜 ${currentMainIngredient}蒸面${isDerma && mainIsHighPro ? ' <span class="derma-warn">⚠️ 皮炎期慎用</span>' : ''}</div>`;
+      html += `<div class="method-detail">碎碎面 5g + 水 65g，25火力蒸12分钟</div>`;
+      html += `</div>`;
+      // 蒸糕
+      html += `<div class="method-card">`;
+      html += `<div class="method-title">🧁 ${template.prepCakeName}${cakeHighPro ? ' <span class="derma-warn">⚠️ 皮炎期慎用</span>' : ''}</div>`;
+      if (isMeat || isFish) {
+        const cakePortion = (template.prepCakeIngredients.match(/(\d+)g做蒸糕/) || [])[1] || '60';
+        html += `<div class="method-detail">取${cakePortion}g肉泥 → 加入适量淀粉和水搅匀 → 25火力蒸10-15分钟</div>`;
+      } else {
+        html += `<div class="method-detail">蒸糕配方比例 3:2:1 → 主食材 ${mainG}g : 水 ${waterG}g : 面粉 ${flourG}g = ${cakeTotalG}g，25火力蒸10-15分钟</div>`;
+      }
+      html += `</div>`;
+      html += `</div></div>`;
+
+      html += `</div>`;
+    } else {
+      // ---- 非备菜日结构: 新鲜制 + 冰箱取 + 晚餐 + 可搭配建议 ----
+      const isDerma = isDermaActive();
+      html += `<div class="day-meals">`;
+      let hasFrozen = false;
+      plan.meals.forEach(m => {
+        const isDinner = m.time === '晚餐';
+        const icon = isDinner ? '🌙' : '🍽️';
+        const isFreshMeatball = m.fresh && (m.fresh.includes('丸') || m.fresh.includes('批量') || m.fresh.includes('冷冻备用'));
+        if (m.fresh) {
+          const hpWarn = isDerma && hasHighProtein(m.fresh) ? ' <span class="derma-warn">⚠️ 皮炎期慎用</span>' : '';
+          const label = isFreshMeatball ? '（新鲜制作 · 冷冻备用）' : (isDinner ? '（晚餐）' : '（新鲜制）');
+          html += `<div class="meal-line">${icon} <b>${m.fresh}</b> <span class="${isFreshMeatball ? 'fresh-meatball' : 'fresh'}">${label}</span>${hpWarn}</div>`;
+        }
+        if (m.frozen) {
+          hasFrozen = true;
+          const hpWarn = isDerma && hasHighProtein(m.frozen) ? ' <span class="derma-warn">⚠️ 皮炎期慎用</span>' : '';
+          html += `<div class="meal-line">🥶 ${m.frozen} <span class="frozen">（${m.frozenDay}制 → 冰箱取${isDinner ? '，晚餐' : ''}）</span>${hpWarn}</div>`;
+        }
+        if (m.suggest) {
+          const hpWarn = isDerma && hasHighProtein(m.suggest) ? ' <span class="derma-warn">⚠️ 皮炎期慎用</span>' : '';
+          html += `<div class="meal-line">💡 ${m.suggest} <span class="suggest">（冻存泥 + 新鲜食材搭配）</span>${hpWarn}</div>`;
+        }
+      });
+      html += `</div>`;
+    }
+
+    // 营养标签
+    html += `<div class="nutrition-tags">`;
+    const t = nutrition;
+    html += t.meat ? `<span class="tag tag-green">✅ 有肉</span>` : `<span class="tag tag-red">❌ 缺肉</span>`;
+    html += t.veg ? `<span class="tag tag-green">✅ 有菜</span>` : `<span class="tag tag-red">❌ 缺菜</span>`;
+    html += t.grain ? `<span class="tag tag-green">✅ 有淀粉</span>` : `<span class="tag tag-red">❌ 缺淀粉</span>`;
+    if (t.sweet) html += `<span class="tag tag-orange">🍬 ${t.sweet}</span>`;
+    if (isDermaActive() && t.meat) html += `<span class="derma-warn" style="font-size:11px;">⚠️ 含高蛋白，皮炎期谨慎观察</span>`;
+    html += `</div>`;
+
+    html += `</div>`; // plan-day-wrap
+
+    // 每周分隔线（周日之后）
+    if (i === 6) {
+      html += `<div class="week-divider"><span>--- 下一周 ---</span></div>`;
+    }
+  });
+
+  html += `<div class="scroll-hint">↓ 上滑查看周三～周日</div>`;
+  scroll.innerHTML = html;
+}
+
+// ============================================================
+// INGREDIENT PICKER (预设 + 自定义)
+// ============================================================
+let CUSTOM_INGREDIENTS = JSON.parse(localStorage.getItem('customIngredients') || '[]');
+let CUSTOM_PLAN_TEMPLATES = JSON.parse(localStorage.getItem('customPlanTemplates') || '{}');
+
+function saveCustomIngredients() {
+  localStorage.setItem('customIngredients', JSON.stringify(CUSTOM_INGREDIENTS));
+  localStorage.setItem('customPlanTemplates', JSON.stringify(CUSTOM_PLAN_TEMPLATES));
+}
+
+function getAllIngredients() {
+  return [...PRESET_INGREDIENTS, ...CUSTOM_INGREDIENTS];
+}
+
+// 自动为自定义食材生成一周计划模板
+function autoGenerateTemplate(ingName, pairIng, sweetIngs, isMeat) {
+  const pair = pairIng || (isMeat ? '胡萝卜' : '红枣');
+  const sweets = sweetIngs || (isMeat ? ['胡萝卜', '南瓜'] : ['红枣', '胡萝卜']);
+  const cakeName = isMeat ? `${ingName}${pair}蒸糕` : `${ingName}${pair}蒸糕`;
+  const ingrDesc = isMeat ? `100g ${ingName}碎 → 60g做蒸糕 + 剩余冷冻囤货` : `60g ${ingName}泥 + 20g ${pair}`;
+  const freezeDesc = '周三蒸面 / 周日蒸面';
+
+  if (isMeat) {
+    return {
+      pair, sweet: sweets, prepCakeName: cakeName, prepCakeIngredients: ingrDesc, freezeUse: freezeDesc,
+      plans: [
+        { day:'周一', isPrep:true },
+        { day:'周二', meals:[{time:'午餐',fresh:`山药${ingName}蒸面`,frozen:`${cakeName}`,frozenDay:'周一'}] },
+        { day:'周三', meals:[{time:'午餐',fresh:`西兰花${ingName}蒸面`,frozen:`${ingName}碎`,frozenDay:'周一'}] },
+        { day:'周四', meals:[{time:'午餐',fresh:`南瓜${ingName}蒸面`,frozen:`${cakeName}`,frozenDay:'周一'}] },
+        { day:'周五', meals:[{time:'午餐',fresh:`${ingName}丸（批量制作冷冻备用）`},{time:'午餐',fresh:`胡萝卜${ingName}蒸面`,frozen:`${ingName}碎`,frozenDay:'周一'}] },
+        { day:'周六', meals:[{time:'午餐',fresh:`山药${ingName}蒸面`,frozen:`${ingName}丸`,frozenDay:'周五'},{time:'午餐',frozen:`${cakeName}`,frozenDay:'周一'}] },
+        { day:'周日', meals:[{time:'午餐',fresh:`西兰花${ingName}蒸面`,frozen:`${ingName}丸`,frozenDay:'周五'},{time:'晚餐',frozen:`${cakeName}`,frozenDay:'周一'}] },
+      ]
+    };
+  } else {
+    return {
+      pair, sweet: sweets, prepCakeName: cakeName, prepCakeIngredients: ingrDesc, freezeUse: freezeDesc,
+      plans: [
+        { day:'周一', isPrep:true },
+        { day:'周二', meals:[{time:'午餐',fresh:`胡萝卜${ingName}蒸面`,frozen:cakeName,frozenDay:'周一'}] },
+        { day:'周三', meals:[{time:'午餐',fresh:`西兰花${ingName}蒸面`,frozen:`${ingName}泥`,frozenDay:'周一'}] },
+        { day:'周四', meals:[{time:'午餐',fresh:`南瓜${ingName}蒸面`,frozen:cakeName,frozenDay:'周一'}] },
+        { day:'周五', meals:[{time:'午餐',fresh:'猪肉丸（批量制作冷冻备用）'},{time:'午餐',fresh:`猪肉${ingName}蒸面`,frozen:`${ingName}泥`,frozenDay:'周一'}] },
+        { day:'周六', meals:[{time:'午餐',fresh:`山药猪肉蒸面`,frozen:'猪肉丸',frozenDay:'周五'},{time:'午餐',frozen:cakeName,frozenDay:'周一'}] },
+        { day:'周日', meals:[{time:'午餐',fresh:`胡萝卜猪肉蒸面`,frozen:'猪肉丸',frozenDay:'周五'},{time:'晚餐',frozen:cakeName,frozenDay:'周一'}] },
+      ]
+    };
+  }
+}
+
+function showIngredientPicker() {
+  const modal = document.getElementById('ingredient-modal');
+  const container = document.getElementById('ingredient-options');
+  container.innerHTML = '';
+  
+  // 预设食材
+  PRESET_INGREDIENTS.forEach(ing => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:4px;';
+    const tpl = PLAN_TEMPLATES[ing];
+    const isMeat = tpl && (tpl.prepCakeName || '').includes('丸');
+    const icon = isMeat ? '🥩' : '🥬';
+    const btn = document.createElement('button');
+    btn.textContent = icon + ' ' + ing;
+    btn.style.cssText = `flex:1;background:${ing === currentMainIngredient ? 'var(--purple)' : '#f5f5f3'};color:${ing === currentMainIngredient ? 'white' : '#666'};border:none;border-radius:8px;padding:10px 0;font-size:13px;cursor:pointer;`;
+    btn.onclick = () => {
+      currentMainIngredient = ing;
+      closeModal('ingredient-modal');
+      renderWeeklyPlan();
+      localStorage.setItem('mainIngredient', ing);
+    };
+    row.appendChild(btn);
+    container.appendChild(row);
+  });
+
+  // 分隔线
+  if (CUSTOM_INGREDIENTS.length > 0) {
+    const sep = document.createElement('div');
+    sep.style.cssText = 'border-top:1px dashed #ddd;margin:8px 0;text-align:center;font-size:10px;color:#aaa;padding-top:4px;';
+    sep.textContent = '自定义食材';
+    container.appendChild(sep);
+  }
+
+  // 自定义食材
+  CUSTOM_INGREDIENTS.forEach((ing, idx) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:4px;';
+    const btn = document.createElement('button');
+    btn.textContent = '⭐ ' + ing;
+    btn.style.cssText = `flex:1;background:${ing === currentMainIngredient ? 'var(--purple)' : '#f5f5f3'};color:${ing === currentMainIngredient ? 'white' : '#666'};border:none;border-radius:8px;padding:10px 0;font-size:13px;cursor:pointer;`;
+    btn.onclick = () => {
+      currentMainIngredient = ing;
+      closeModal('ingredient-modal');
+      renderWeeklyPlan();
+      localStorage.setItem('mainIngredient', ing);
+    };
+    const delBtn = document.createElement('span');
+    delBtn.textContent = '✕';
+    delBtn.style.cssText = 'color:#ccc;cursor:pointer;font-size:14px;padding:4px 8px;';
+    delBtn.onclick = (e) => { e.stopPropagation(); delCustomIngredient(idx); };
+    row.appendChild(btn);
+    row.appendChild(delBtn);
+    container.appendChild(row);
+  });
+
+  // 添加按钮
+  const addRow = document.createElement('div');
+  addRow.style.cssText = 'margin-top:8px;';
+  const addBtn = document.createElement('button');
+  addBtn.textContent = '＋ 自定义主食材';
+  addBtn.style.cssText = 'width:100%;background:#f0f0ff;color:var(--purple);border:1.5px dashed var(--purple-light);border-radius:8px;padding:10px 0;font-size:13px;cursor:pointer;';
+  addBtn.onclick = () => {
+    closeModal('ingredient-modal');
+    showCustomIngredientModal();
+  };
+  addRow.appendChild(addBtn);
+  container.appendChild(addRow);
+
+  modal.classList.add('show');
+}
+
+// 删除自定义食材
+function delCustomIngredient(idx) {
+  const ingName = CUSTOM_INGREDIENTS[idx];
+  if (!confirm(`确定删除自定义食材「${ingName}」及其一周计划？`)) return;
+  CUSTOM_INGREDIENTS.splice(idx, 1);
+  delete CUSTOM_PLAN_TEMPLATES[ingName];
+  saveCustomIngredients();
+  if (currentMainIngredient === ingName) {
+    currentMainIngredient = '山药';
+    renderWeeklyPlan();
+    localStorage.setItem('mainIngredient', '山药');
+  }
+  showIngredientPicker();
+}
+
+// 新增自定义食材弹窗
+function showCustomIngredientModal() {
+  // 动态创建弹窗（复用已有结构）
+  let modal = document.getElementById('custom-ing-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'custom-ing-modal';
+    modal.className = 'modal-overlay';
+    modal.innerHTML = `
+      <div class="modal-box">
+        <h3>＋ 自定义主食材</h3>
+        <label>食材名称</label>
+        <input type="text" id="ci-name" placeholder="例如：红薯 / 玉米 / 虾仁">
+        <p style="font-size:11px;color:#aaa;margin-bottom:12px;">蒸糕搭配食材和甜味食材将自动生成</p>
+        <div class="modal-actions">
+          <button class="modal-btn cancel" onclick="closeModal('custom-ing-modal')">取消</button>
+          <button class="modal-btn confirm" onclick="addCustomIngredient()">确认添加</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('show'); });
+  }
+  document.getElementById('ci-name').value = '';
+  modal.classList.add('show');
+}
+
+function addCustomIngredient() {
+  const name = document.getElementById('ci-name').value.trim();
+  if (!name) { alert('请填写食材名称'); return; }
+  if (PRESET_INGREDIENTS.includes(name) || CUSTOM_INGREDIENTS.includes(name)) { alert('该食材已存在'); return; }
+
+  // 自动判断是否为肉类
+  const isMeat = ['肉','鱼','虾','鸡','牛','猪','鳕','羊'].some(w => name.includes(w));
+  const pair = isMeat ? '胡萝卜' : '红枣';
+  const sweets = isMeat ? ['胡萝卜','南瓜'] : ['红枣','胡萝卜'];
+  CUSTOM_INGREDIENTS.push(name);
+  CUSTOM_PLAN_TEMPLATES[name] = autoGenerateTemplate(name, pair, sweets, isMeat);
+  saveCustomIngredients();
+
+  // 合并 PLAN_TEMPLATES
+  Object.assign(PLAN_TEMPLATES, CUSTOM_PLAN_TEMPLATES);
+
+  closeModal('custom-ing-modal');
+  currentMainIngredient = name;
+  renderWeeklyPlan();
+  localStorage.setItem('mainIngredient', name);
+  showIngredientPicker();
+}
+
+// ============================================================
+// DATA: FRIDGE (支持新增/删除, 存localStorage)
+// ============================================================
+let FRIDGE_ITEMS = JSON.parse(localStorage.getItem('fridgeItems') || 'null');
+if (!FRIDGE_ITEMS) {
+  FRIDGE_ITEMS = [
+    { id: 'pre_1', name: '🧁 鸡肉玉米糕', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_2', name: '🧁 鸡肉玉米糕', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_3', name: '🥣 纯鸡肉泥', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_4', name: '🥣 纯鸡肉泥', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_5', name: '🥣 鸡肉玉米泥', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_6', name: '🥣 鸡肉玉米泥', madeDate: '2026-05-27', expiryDays: 7 },
+    { id: 'pre_7', name: '🥣 鸡肉玉米泥', madeDate: '2026-05-27', expiryDays: 7 },
+  ];
+}
+
+function saveFridge() {
+  localStorage.setItem('fridgeItems', JSON.stringify(FRIDGE_ITEMS));
+}
+
+function calcFridgeStatus(madeDateStr, expiryDays) {
+  const made = new Date(madeDateStr);
+  const now = new Date();
+  const diff = Math.ceil((now - made) / (1000*60*60*24));
+  const remaining = expiryDays - diff;
+  if (remaining <= 0) return { status: 'danger', label: '🔴 已过期', cls: 'badge-danger' };
+  if (remaining <= 3) return { status: 'warn', label: `⚠️ ${remaining}天后`, cls: 'badge-warn' };
+  return { status: 'ok', label: `✅ ${remaining}天后`, cls: 'badge-ok' };
+}
+
+function renderFridge() {
+  const list = document.getElementById('fridge-list');
+  let html = '';
+  if (FRIDGE_ITEMS.length === 0) {
+    html = '<div style="text-align:center;padding:20px;color:#ccc;font-size:13px;">暂无库存，点击下方按钮添加</div>';
+    list.innerHTML = html;
+    return;
+  }
+  FRIDGE_ITEMS.forEach((item, idx) => {
+    const s = calcFridgeStatus(item.madeDate, item.expiryDays);
+    const made = new Date(item.madeDate);
+    const expiry = new Date(made);
+    expiry.setDate(made.getDate() + item.expiryDays);
+    const expiryStr = `${expiry.getMonth()+1}/${expiry.getDate()}`;
+    html += `<div class="fridge-item">`;
+    html += `<div class="item-info"><p class="item-name">${item.name}</p>`;
+    html += `<p class="item-meta">制作：${item.madeDate.slice(5)} · 到期：${expiryStr}</p></div>`;
+    html += `<span class="fridge-badge ${s.cls}">${s.label}</span>`;
+    html += `<span class="fridge-del" onclick="delFridgeItem(${idx})" title="删除">🗑️</span>`;
+    html += `</div>`;
+  });
+  list.innerHTML = html;
+}
+
+function showAddFridgeModal() {
+  document.getElementById('fridge-modal').classList.add('show');
+  // 默认今天
+  const today = new Date();
+  document.getElementById('fr-date').value = today.toISOString().slice(0,10);
+  document.getElementById('fr-name').value = '';
+}
+
+function addFridgeItem() {
+  const name = document.getElementById('fr-name').value.trim();
+  const date = document.getElementById('fr-date').value;
+  if (!name) { alert('请填写辅食名称'); return; }
+  if (!date) { alert('请选择制作日期'); return; }
+  FRIDGE_ITEMS.push({ id: 'fr_' + Date.now(), name, madeDate: date, expiryDays: 7 });
+  saveFridge();
+  closeModal('fridge-modal');
+  renderFridge();
+}
+
+function delFridgeItem(idx) {
+  if (!confirm('确定删除「' + FRIDGE_ITEMS[idx].name + '」？')) return;
+  FRIDGE_ITEMS.splice(idx, 1);
+  saveFridge();
+  renderFridge();
+}
+
+// ============================================================
+// FORMULA TABS
+// ============================================================
+let activeFormulaTab = 'steamCake';
+let CUSTOM_FORMULAS = JSON.parse(localStorage.getItem('customFormulas') || '[]');
+
+const PRESET_FORMULAS = {
+  steamCake: {
+    name: '🧁 蒸糕',
+    ratio: { a: 3, b: 2, c: 1, aLabel: '主食材泥', bLabel: '水', cLabel: '面粉' },
+    standard: '常规取用：60g泥 + 40g水 + 20g面粉 → 调至酸奶稠度',
+    steps: [
+      '食材蒸熟，辅食机打细腻泥（肉类/鱼类务必先全熟再打）',
+      '按配比加水、加面粉，搅拌均匀',
+      '倒入模具：先在模具抹辅食油，再挤入泥定型',
+      '25火力，蒸10-15分钟'
+    ],
+    note: '已做款式：山药红枣糕 / 胡萝卜蒸糕 / 南瓜蒸糕 / 胡萝卜西兰花蒸糕'
+  },
+  steamNoodle: {
+    name: '🍜 蒸面',
+    ratio: null,
+    standard: '蒸面基础配方：碎碎面 5g + 清水 65g',
+    steps: [
+      '水煮沸',
+      '下面 + 预制荤料（肉碎/鱼泥）',
+      '25火力蒸12分钟',
+      '出锅拌入蔬菜泥/山药泥'
+    ],
+    note: '经典搭配：山药猪肉胡萝卜蒸面\n南瓜鳕鱼蒸面'
+  },
+  porridge: {
+    name: '🥣 粥',
+    ratio: { a: 1, b: 7, c: null, aLabel: '米', bLabel: '水', cLabel: '' },
+    standard: '常规取用：大米 15g + 清水 105g（可按 1:7 比例调整分量）',
+    steps: [
+      '早上或中午开始煲：大米淘洗后放入炖锅，选择「BB粥」模式自动炖煮至软烂稠糯',
+      '下午喂食前：取适量粥加入煮熟的配菜（胡萝卜泥/南瓜泥/肉碎等），加热搅拌均匀',
+      '⚠️ 绿叶菜（菠菜/小白菜等）切记不能提前与生米同煮，需单独焯熟后拌入'
+    ],
+    note: '配菜建议：胡萝卜 / 南瓜 / 山药 / 猪肉碎 / 鳕鱼碎\n绿叶菜须焯熟后临吃前拌入，不可提前同煮'
+  }
+};
+
+function renderFormulaTabs() {
+  const container = document.getElementById('formula-tabs');
+  let html = '';
+  ['steamCake', 'steamNoodle', 'porridge'].forEach(key => {
+    const f = PRESET_FORMULAS[key];
+    const active = key === activeFormulaTab ? ' active' : '';
+    html += `<div class="ftab${active}" data-tab="${key}" onclick="switchFormulaTab('${key}')">${f.name}</div>`;
+  });
+  CUSTOM_FORMULAS.forEach((f, idx) => {
+    const active = f.id === activeFormulaTab ? ' active' : '';
+    html += `<div class="ftab${active}" data-tab="${f.id}" onclick="switchFormulaTab('${f.id}')" ondblclick="editFormulaTab(${idx})">${f.name} ✕</div>`;
+  });
+  html += `<div class="ftab add-tab" onclick="showAddFormulaModal()">＋</div>`;
+  container.innerHTML = html;
+}
+
+function switchFormulaTab(key) {
+  activeFormulaTab = key;
+  renderFormulaTabs();
+  renderFormulaBody();
+}
+
+function renderFormulaBody() {
+  const body = document.getElementById('formula-body');
+  const custom = CUSTOM_FORMULAS.find(f => f.id === activeFormulaTab);
+  if (custom) {
+    let html = `<p class="formula-title">${custom.name}</p>`;
+    if (custom.standard) {
+      html += `<p style="margin:0 0 8px;color:#666;font-size:12px;line-height:1.7;">${custom.standard.replace(/\n/g, '<br>')}</p>`;
+    }
+    if (custom.steps && custom.steps.length) {
+      html += `<p style="margin:8px 0 4px;font-size:12px;font-weight:500;color:#555;">步骤：</p>`;
+      custom.steps.forEach((s, i) => {
+        html += `<p style="margin:0;color:#666;font-size:12px;line-height:1.7;">${i+1}. ${s}</p>`;
+      });
+    }
+    body.innerHTML = html;
+    return;
+  }
+  const f = PRESET_FORMULAS[activeFormulaTab];
+  if (!f) return;
+  let html = `<p class="formula-title">${f.name}</p>`;
+  if (f.ratio) {
+    html += `<div class="formula-ratio">`;
+    html += `<span class="num">${f.ratio.a}</span><span class="label">（${f.ratio.aLabel}）</span>`;
+    html += `<span class="num">:</span>`;
+    html += `<span class="num">${f.ratio.b}</span><span class="label">（${f.ratio.bLabel}）</span>`;
+    if (f.ratio.c !== null && f.ratio.c !== undefined) {
+      html += `<span class="num">:</span>`;
+      html += `<span class="num">${f.ratio.c}</span><span class="label">（${f.ratio.cLabel}）</span>`;
+    }
+    html += `</div>`;
+  }
+  if (f.standard) {
+    html += `<p style="margin:0 0 8px;color:#666;font-size:12px;line-height:1.7;">${f.standard.replace(/\n/g, '<br>')}</p>`;
+  }
+  if (f.steps && f.steps.length) {
+    html += `<p style="margin:8px 0 4px;font-size:12px;font-weight:500;color:#555;">步骤：</p>`;
+    f.steps.forEach((s, i) => {
+      const isWarn = s.startsWith('⚠️');
+      const color = isWarn ? '#c44a4a' : '#666';
+      const bg = isWarn ? 'background:#fff5f5;border-left:3px solid #ffa0a0;border-radius:4px;padding:3px 7px;margin:4px 0;' : '';
+      html += `<p style="margin:0;color:${color};font-size:12px;line-height:1.7;${bg}">${i+1}. ${s}</p>`;
+    });
+  }
+  if (f.note) {
+    html += `<p class="formula-note">${f.note.replace(/\n/g, '<br>')}</p>`;
+  }
+  body.innerHTML = html;
+}
+
+function showAddFormulaModal() {
+  document.getElementById('formula-modal').classList.add('show');
+}
+
+function addFormulaTab() {
+  const name = document.getElementById('fm-name').value.trim();
+  const ratio = document.getElementById('fm-ratio').value.trim();
+  const steps = document.getElementById('fm-steps').value.trim();
+  if (!name) { alert('请填写公式名称'); return; }
+  const id = 'custom_' + Date.now();
+  CUSTOM_FORMULAS.push({ id, name, standard: ratio, steps: steps ? steps.split('\n') : [], ratio: null });
+  localStorage.setItem('customFormulas', JSON.stringify(CUSTOM_FORMULAS));
+  closeModal('formula-modal');
+  renderFormulaTabs();
+  switchFormulaTab(id);
+  document.getElementById('fm-name').value = '';
+  document.getElementById('fm-ratio').value = '';
+  document.getElementById('fm-steps').value = '';
+}
+
+function editFormulaTab(idx) {
+  if (!confirm('确定删除此自定义公式？')) return;
+  CUSTOM_FORMULAS.splice(idx, 1);
+  localStorage.setItem('customFormulas', JSON.stringify(CUSTOM_FORMULAS));
+  if (activeFormulaTab === CUSTOM_FORMULAS[idx]?.id) activeFormulaTab = 'steamCake';
+  renderFormulaTabs();
+  renderFormulaBody();
+}
+
+// ============================================================
+// INSPIRATION RECIPES
+// ============================================================
+let selectedRecipes = [];
+
+const ALL_RECIPES = [
+  { id: 1, name: '山药红枣猪肉糕', type: 'steamCake', age: 9, highProtein: true,  goodConstipation: true,  goodDiarrhea: false, ingredients: ['山药'] },
+  { id: 2, name: '胡萝卜蒸糕',     type: 'steamCake', age: 9, highProtein: false, goodConstipation: true,  goodDiarrhea: true,  ingredients: ['胡萝卜'] },
+  { id: 3, name: '南瓜蒸糕',       type: 'steamCake', age: 9, highProtein: false, goodConstipation: true,  goodDiarrhea: true,  ingredients: ['南瓜'] },
+  { id: 4, name: '胡萝卜西兰花蒸糕', type: 'steamCake', age: 9, highProtein: false, goodConstipation: true,  goodDiarrhea: false, ingredients: ['胡萝卜', '西兰花'] },
+  { id: 5, name: '山药南瓜蒸糕',   type: 'steamCake', age: 9, highProtein: false, goodConstipation: true,  goodDiarrhea: true,  ingredients: ['山药', '南瓜'] },
+  { id: 6, name: '猪肉胡萝卜蒸面', type: 'steamNoodle', age: 9, highProtein: true,  goodConstipation: false, goodDiarrhea: false, ingredients: [] },
+  { id: 7, name: '山药猪肉胡萝卜蒸面', type: 'steamNoodle', age: 9, highProtein: true,  goodConstipation: false, goodDiarrhea: false, ingredients: [] },
+  { id: 8, name: '猪肉丸',         type: 'meatball', age: 9, highProtein: true,  goodConstipation: false, goodDiarrhea: false, ingredients: [] },
+  { id: 9, name: '鳕鱼丸',         type: 'meatball', age: 9, highProtein: true,  goodConstipation: false, goodDiarrhea: true,  ingredients: ['鳕鱼'] },
+  { id: 10, name: '猪肉胡萝卜饼',  type: 'meatPatty', age: 9, highProtein: true,  goodConstipation: false, goodDiarrhea: false, ingredients: [] },
+  { id: 11, name: '牛肉南瓜饼',    type: 'meatPatty', age: 10, highProtein: true, goodConstipation: false, goodDiarrhea: false, ingredients: [] },
+  { id: 12, name: '生苹果泥',       type: 'fruit', age: 7, highProtein: false, goodConstipation: true,  goodDiarrhea: false, ingredients: ['生苹果'] },
+  { id: 13, name: '熟苹果泥',       type: 'fruit', age: 7, highProtein: false, goodConstipation: false, goodDiarrhea: true,  ingredients: ['熟苹果'] },
+  { id: 14, name: '鸡肉玉米糕',     type: 'steamCake', age: 9, highProtein: true,  goodConstipation: false, goodDiarrhea: false, ingredients: ['鸡肉', '玉米'] },
+  { id: 15, name: '鸡肉蒸面',       type: 'steamNoodle', age: 9, highProtein: true,  goodConstipation: false, goodDiarrhea: false, ingredients: ['鸡肉'] },
+];
+
+const TYPE_LABELS = {
+  steamCake: '🧁 蒸糕', steamNoodle: '🍜 蒸面', meatball: '🍖 肉丸',
+  meatPatty: '🥩 肉饼', dumpling: '🥟 小饺子', risotto: '🍚 烩饭', tofu: '🧆 豆腐',
+  fruit: '🍎 水果'
+};
+
+let activeInspireFilter = 'all';
+
+function renderInspireFilters() {
+  const container = document.getElementById('inspire-filters');
+  const types = ['all', ...new Set(ALL_RECIPES.map(r => r.type))];
+  let html = '';
+  types.forEach(t => {
+    const label = t === 'all' ? '全部' : TYPE_LABELS[t] || t;
+    const active = t === activeInspireFilter ? 'active' : 'inactive';
+    html += `<span class="filter-tag ${active}" onclick="setInspireFilter('${t}')">${label}</span>`;
+  });
+  container.innerHTML = html;
+}
+
+function setInspireFilter(t) {
+  activeInspireFilter = t;
+  renderInspireFilters();
+  renderRecipes();
+}
+
+function renderRecipes() {
+  const container = document.getElementById('recipe-list');
+  const age = calcAge();
+  let list = ALL_RECIPES.filter(r => r.age <= age.current + 1);
+  if (activeInspireFilter !== 'all') list = list.filter(r => r.type === activeInspireFilter);
+
+  let html = '';
+  list.forEach(r => {
+    const isSelected = selectedRecipes.includes(r.id);
+    const isDerma = activeStatuses.includes('dermatitis') && r.highProtein;
+    const isConstipation = activeStatuses.includes('constipation') && r.goodConstipation;
+    const isDiarrhea = activeStatuses.includes('diarrhea') && r.goodDiarrhea;
+    let cls = 'recipe-card';
+    if (isSelected) cls += ' selected';
+    html += `<div class="${cls}" onclick="toggleRecipe(${r.id})">`;
+    html += `<span class="recipe-check">${isSelected ? '✓' : '○'}</span>`;
+    html += `<div style="flex:1;">`;
+    html += `<p class="recipe-name">${r.name}</p>`;
+    html += `<p class="recipe-meta">${TYPE_LABELS[r.type] || r.type} · ${r.age}M+`;
+    if (r.highProtein) html += ` · 高蛋白`;
+    if (isDerma) html += ` · <span class="derma-warn">⚠️ 皮炎期慎用</span>`;
+    if (isConstipation) html += ` · <span class="constipation-tag">💩 通便友好</span>`;
+    if (isDiarrhea) html += ` · <span class="diarrhea-tag">🛡️ 肠胃友好</span>`;
+    html += `</p></div></div>`;
+  });
+  container.innerHTML = html;
+}
+
+function toggleRecipe(id) {
+  const idx = selectedRecipes.indexOf(id);
+  if (idx >= 0) { selectedRecipes.splice(idx, 1); }
+  else {
+    if (selectedRecipes.length >= 5) { alert('最多选择 5 道食谱'); return; }
+    selectedRecipes.push(id);
+  }
+  renderRecipes();
+}
+
+function generateList() {
+  if (selectedRecipes.length === 0) { alert('请先勾选食谱'); return; }
+  const box = document.getElementById('result-box');
+  let html = '<h3>📋 制作方式汇总</h3>';
+  selectedRecipes.forEach(id => {
+    const r = ALL_RECIPES.find(x => x.id === id);
+    if (!r) return;
+    html += `<p style="margin:8px 0 2px;font-weight:500;color:#444;font-size:12px;">${r.name}</p>`;
+    if (r.type === 'steamCake') html += `<p style="color:#666;font-size:11px;line-height:1.7;">按 3:2:1 配比（60g泥+40g水+20g面粉），25火力蒸10-15分钟</p>`;
+    else if (r.type === 'steamNoodle') html += `<p style="color:#666;font-size:11px;line-height:1.7;">5g面+65g水，煮沸下面+荤料，25火力蒸12分钟，拌入菜泥</p>`;
+    else if (r.type === 'meatball') html += `<p style="color:#666;font-size:11px;line-height:1.7;">肉剁碎+淀粉+水搅匀，搓丸子，沸水煮至浮起</p>`;
+    else if (r.type === 'meatPatty') html += `<p style="color:#666;font-size:11px;line-height:1.7;">肉碎+蔬菜碎+淀粉搅匀，煎锅小火两面煎熟</p>`;
+    else if (r.type === 'fruit' && r.name === '生苹果泥') html += `<p style="color:#666;font-size:11px;line-height:1.7;">新鲜苹果去皮，辅食机打泥/刮泥勺直接刮泥食用 💩 便秘时吃生苹果</p>`;
+    else if (r.type === 'fruit' && r.name === '熟苹果泥') html += `<p style="color:#666;font-size:11px;line-height:1.7;">苹果去皮切块，冷水上锅蒸10分钟至软烂，压成泥 🛡️ 拉肚子时吃熟苹果</p>`;
+  });
+  html += '<hr><h3>🛒 食材采购清单</h3>';
+  const ingredients = {};
+  const mapping = {
+    1:{ '🫘 山药':100,'🍬 红枣':30,'🌾 面粉':30 },
+    2:{ '🥕 胡萝卜':100,'🌾 面粉':30 },
+    3:{ '🎃 南瓜':100,'🌾 面粉':30 },
+    4:{ '🥕 胡萝卜':50,'🥦 西兰花':50,'🌾 面粉':30 },
+    5:{ '🫘 山药':70,'🎃 南瓜':30,'🌾 面粉':30 },
+    6:{ '🥩 猪肉':50,'🥕 胡萝卜':30,'🌾 碎碎面':5 },
+    7:{ '🥩 猪肉':50,'🫘 山药':50,'🥕 胡萝卜':30,'🌾 碎碎面':5 },
+    8:{ '🥩 猪肉':100,'🌾 淀粉':20 },
+    9:{ '🐟 鳕鱼':100,'🌾 淀粉':20 },
+    10:{ '🥩 猪肉':80,'🥕 胡萝卜':30,'🌾 淀粉':15 },
+    11:{ '🥩 牛肉':80,'🎃 南瓜':50,'🌾 淀粉':15 },
+    14:{ '🥩 鸡肉':100,'🌽 玉米':30,'🌾 面粉':30 },
+    15:{ '🥩 鸡肉':50,'🌾 碎碎面':5 },
+  };
+  selectedRecipes.forEach(id => {
+    if (mapping[id]) for (const [k,v] of Object.entries(mapping[id])) ingredients[k] = (ingredients[k]||0) + v;
+  });
+  const meatItems={}, vegItems={}, starchItems={};
+  for (const [k,v] of Object.entries(ingredients)) {
+    if (k.includes('🥩')||k.includes('🐟')) meatItems[k]=v;
+    else if (k.includes('🌾')) starchItems[k]=v;
+    else vegItems[k]=v;
+  }
+  if (Object.keys(meatItems).length) {
+    html += '<p style="margin:4px 0 2px;font-size:11px;font-weight:500;color:#c47a3a;">【荤料区】</p>';
+    for (const [k,v] of Object.entries(meatItems)) html += `<p style="color:#666;font-size:11px;">${k}  ${v}g</p>`;
+  }
+  if (Object.keys(vegItems).length) {
+    html += '<p style="margin:4px 0 2px;font-size:11px;font-weight:500;color:#5a9a5a;">【蔬菜区】</p>';
+    for (const [k,v] of Object.entries(vegItems)) html += `<p style="color:#666;font-size:11px;">${k}  ${v}g</p>`;
+  }
+  if (Object.keys(starchItems).length) {
+    html += '<p style="margin:4px 0 2px;font-size:11px;font-weight:500;color:#4a7ad9;">【主食区】</p>';
+    for (const [k,v] of Object.entries(starchItems)) html += `<p style="color:#666;font-size:11px;">${k}  ${v}g</p>`;
+  }
+  html += '<div style="margin-top:10px;"><button class="modal-btn cancel" style="width:100%;" onclick="clearSelection()">清空重选</button></div>';
+  box.innerHTML = html;
+  box.style.display = 'block';
+}
+
+function clearSelection() {
+  selectedRecipes = [];
+  renderRecipes();
+  document.getElementById('result-box').style.display = 'none';
+}
+
+function filterRecipes() { renderRecipes(); }
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) overlay.classList.remove('show');
+  });
+});
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+  updateHeader();
+  // Merge custom plan templates
+  Object.assign(PLAN_TEMPLATES, CUSTOM_PLAN_TEMPLATES);
+  // Restore status
+  const saved = localStorage.getItem('babyStatus');
+  if (saved) { try { activeStatuses = JSON.parse(saved); } catch(e) {} }
+  // Restore main ingredient
+  const savedIng = localStorage.getItem('mainIngredient');
+  if (savedIng && (PRESET_INGREDIENTS.includes(savedIng) || CUSTOM_INGREDIENTS.includes(savedIng))) {
+    currentMainIngredient = savedIng;
+  }
+  renderStatus();
+  renderWeeklyPlan();
+  renderFridge();
+  renderFormulaTabs();
+  renderFormulaBody();
+  renderInspireFilters();
+  renderRecipes();
+}
+
+init();
+</script>
+</body>
+</html>
